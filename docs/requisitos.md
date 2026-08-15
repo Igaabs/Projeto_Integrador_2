@@ -13,3 +13,16 @@ O sistema deve checar periodicamente o portal e enviar uma notificação push qu
 O sistema deve notificar o aluno sobre cancelamentos de aulas ou recados postados pelos professores no mural virtual da turma. 
 O sistema deve disponibilizar uma tela de chat interativa para comunicação com o Assistente Virtual (Mestre JM IA). 
 O Assistente Virtual deve processar perguntas em linguagem natural e fornecer tutoriais ou explicações sobre processos acadêmicos burocráticos.
+
+## 2. Requisitos não Funcionais:
+Qualidades, restrições e padrões que o sistema deve respeitar.
+
+A interface principal (grade, locais e limite de faltas) deve operar sem internet.
+A interface gráfica deve ser responsiva, desenhada especificamente para uso mobile, exigindo o mínimo de toques para acessar a grade do dia.
+As senhas dos usuários não devem ser armazenadas em texto plano no banco de dados local ou em servidores intermediários. 
+Os processos de extração de dados em segundo plano devem ser otimizados para minimizar o consumo de bateria e de dados móveis do dispositivo.
+O projeto deve garantir que as informações acadêmicas não sejam compartilhadas com terceiros.
+O aplicativo deve ser multiplataforma 
+
+Aluno: Gabriel Ferreira Piauilino
+3° ano B CTBJ/UFPI
