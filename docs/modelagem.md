@@ -2,8 +2,15 @@
 
 Este documento apresenta a modelagem técnica da solução focada no Produto Mínimo Viável (MVP) do projeto **SIGAA de Bolso**, atendendo às especificações da Etapa 2.
 
-**Descrição do Fluxo do Sistema**
-O aplicativo opera sob uma arquitetura híbrida para o MVP: as telas de consulta (grade horária e limite de faltas) consomem um arquivo estático local (Mock JSON) para garantir exibição imediata e simular a experiência mobile, enquanto o módulo de assistente virtual se conecta diretamente à API do Gemini para processamento em nuvem em tempo real.
+**Descrição do Fluxo do Sistema:**
+Para esta etapa do projeto, o aplicativo foi desenvolvido utilizando uma arquitetura híbrida, uma estratégia que combina duas formas distintas de funcionamento: uma parte roda localmente no dispositivo (sem necessidade de internet) e outra conecta-se à rede para acessar recursos externos avançados.
+
+Essa estrutura foi escolhida para a criação do MVP (Minimum Viable Product ou Produto Mínimo Viável), que consiste na versão mais enxuta e funcional da solução. O objetivo do MVP é testar e validar as ideias centrais do sistema com o menor custo de tempo possível antes de desenvolver a versão completa.
+
+O funcionamento dessa arquitetura divide-se nos seguintes componentes técnicos:
+
+* Telas de Consulta (Grade Horária e Faltas): Operam consumindo um arquivo estático local no formato Mock JSON.
+* Módulo de Assistente Virtual: Conecta-se diretamente à API do Gemini para executar o processamento em nuvem em tempo real.
 
 **Diagrama de Arquitetura (Mermaid.js)**
 
