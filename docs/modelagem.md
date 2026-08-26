@@ -7,18 +7,78 @@ O aplicativo opera sob uma arquitetura híbrida para o MVP: as telas de consulta
 
 **Diagrama de Arquitetura (Mermaid.js)**
 
+# Arquitetura da Solução — SIGAA de Bolso
+
+## 1. Fluxo do sistema
 ```mermaid
-graph TD
-    A[Usuário / Aluno] --> B(SIGAA de Bolso - Aplicativo)
-    
-    subgraph Módulo Offline e Interface
-        B --> C[Tela de Login]
-        B --> D[Visualizador de Grade e Faltas]
-        D --> E[(Base Local - Mock JSON)]
-    end
-    
-    subgraph Módulo de Inteligência Artificial
-        B --> F[Interface do Chatbot]
-        F --> G[API do Gemini.ia]
-        G -->|Respostas em Tempo Real| F
-    end
+flowchart TD
+    A[Estudante] --> B{Ação no App}
+    B --> C[Login / Autenticação]
+    B --> D[Consultar Grade Horária]
+    B --> E[Consultar Faltas]
+    B --> F[Perguntar ao Chatbot IA]
+    C --> G[(Cache Local / Mock JSON)]
+    D --> G
+    E --> G
+    F --> H[API do Gemini.ia]
+    H --> F
+
+```
+
+## 2. Arquitetura em camadas
+
+```mermaid
+graph LR
+    Frontend[App Mobile - React Native/Expo] --> Services[Camada de Serviços]
+    Services --> Auth[Módulo de Autenticação]
+    Services --> Academico[Módulo Acadêmico]
+    Services --> IA[Módulo de Chatbot IA]
+    Auth --> Cache[(Cache Local / Mock JSON)]
+    Academico --> Cache
+    IA --> Gemini[API do Gemini.ia]
+
+```
+
+## 3. Modelo de dados (entidades principais)
+
+```mermaid
+erDiagram
+    ESTUDANTE ||--o{ MATRICULA : possui
+    MATRICULA }|--|| DISCIPLINA : pertence
+    MATRICULA ||--o{ REGISTRO_FALTA : registra
+    ESTUDANTE ||--o{ MENSAGEM_CHAT : envia
+
+    ESTUDANTE {
+        int id PK
+        string matricula
+        string nome
+        string curso
+    }
+    DISCIPLINA {
+        int id PK
+        string codigo
+        string nome
+        string local_sala
+        string horario
+    }
+    REGISTRO_FALTA {
+        int id PK
+        int quantidade_faltas
+        int limite_maximo
+    }
+    MENSAGEM_CHAT {
+        int id PK
+        string pergunta
+        string resposta
+        date data_envio
+    }
+
+```
+
+## 4. Justificativa das escolhas
+
+* **App Mobile e Cache Local (Offline-First)**: atende ao RNF01 e RNF02 (acesso instantâneo à grade e locais de aula mesmo sem conexão com a internet).
+* **Módulo de Autenticação e Mock Data Store**: cobre RF01, RF02, RNF03 e RNF07 (garante a simulação do fluxo de login e leitura segura dos dados para o MVP).
+* **Módulo Acadêmico**: cobre RF03 e RF04 (exibição estruturada da grade semanal, horários, prédios/salas e acompanhamento do limite de faltas).
+* **Módulo de Chatbot IA (API Gemini)**: cobre RF08 e RF09 (interface de conversa em linguagem natural para tirar dúvidas acadêmicas).
+* **Link para o Trello:** https://trello.com/invite/b/6a8a36de3ae7e7515fed6ab6/ATTI3d6fdeff5870f66e1a879dad36b4a57d581CE463/projeto-sigaa-de-bolso
