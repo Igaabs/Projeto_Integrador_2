@@ -178,22 +178,26 @@
           </div>
         </section>
 
-        <!-- ABA 5: CHATBOT IA -->
+        <!-- ABA 5: CHATBOT IA - MESTRE JM -->
         <section id="tab-chat" class="space-y-2 hidden flex flex-col h-full min-h-[350px]">
-          <h3 class="font-bold text-xs text-gray-700 border-b pb-1 uppercase">Assistente Virtual (Gemini IA)</h3>
+          <div class="flex items-center gap-2 border-b pb-1">
+            <i class="fa-solid fa-user-ninja text-blue-900 text-sm"></i>
+            <h3 class="font-bold text-xs text-gray-700 uppercase">Mestre JM - Assistente Acadêmico</h3>
+          </div>
           
           <div id="chat-messages" class="flex-1 bg-white border sigaa-border rounded p-2.5 overflow-y-auto text-xs space-y-2 max-h-[280px]">
-            <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2 rounded max-w-[90%]">
-              Olá! Sou seu assistente do SIGAA. Tire dúvidas sobre processos de matrícula, prazos ou disciplinas.
+            <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded max-w-[90%] shadow-sm">
+              <p class="font-bold text-[11px] mb-1"><i class="fa-solid fa-robot text-blue-700"></i> Mestre JM:</p>
+              Olá! Sou o <b>Mestre JM</b>, seu assistente virtual. Pode me perguntar sobre <b>faltas</b>, <b>horários</b>, <b>atividades</b> ou <b>notas</b>!
             </div>
           </div>
 
-          <div class="flex gap-1.5 pt-1">
-            <input type="text" id="chat-input" placeholder="Digite sua dúvida..." class="flex-1 border p-2 text-xs rounded outline-none focus:border-blue-700">
-            <button onclick="sendChatMessage()" class="sigaa-bg-dark text-white px-3 py-2 rounded text-xs font-bold">
+          <form onsubmit="handleChatSubmit(event)" class="flex gap-1.5 pt-1">
+            <input type="text" id="chat-input" placeholder="Pergunte ao Mestre JM..." class="flex-1 border p-2 text-xs rounded outline-none focus:border-blue-700">
+            <button type="submit" class="sigaa-bg-dark text-white px-3 py-2 rounded text-xs font-bold hover:opacity-90">
               <i class="fa-solid fa-paper-plane"></i>
             </button>
-          </div>
+          </form>
         </section>
 
       </main>
@@ -302,7 +306,7 @@
           <i class="fa-solid fa-clipboard-user text-base block mb-0.5"></i> Faltas
         </button>
         <button onclick="switchTab('chat')" id="btn-chat" class="flex-1 text-center hover:text-blue-800">
-          <i class="fa-solid fa-robot text-base block mb-0.5"></i> Chat IA
+          <i class="fa-solid fa-robot text-base block mb-0.5"></i> Mestre JM
         </button>
       </nav>
 
@@ -323,7 +327,6 @@
       { id: 8, nome: "SEGURANÇA DA INFORMAÇÃO", local: "CTBJ/UFPI090", professor: "Elineide", horario: "6T74 23N1", faltas: 5, limite: 15, atividade: "Estudo de Caso sobre Criptografia" }
     ];
 
-    // SISTEMA DE NOTIFICAÇÕES FLUTUANTES (TOAST)
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -487,20 +490,53 @@
       document.getElementById('btn-subtab-' + sub).className = "flex-1 py-2 text-center text-blue-900 border-b-2 border-blue-800 bg-white font-bold";
     }
 
-    function sendChatMessage() {
+    // LÓGICA DE RESPOSTAS INTELIGENTES DO MESTRE JM
+    function handleChatSubmit(e) {
+      e.preventDefault();
       const input = document.getElementById('chat-input');
       const box = document.getElementById('chat-messages');
-      const val = input.value.trim();
-      if (!val) return;
+      const query = input.value.trim();
+      if (!query) return;
 
-      box.innerHTML += `<div class="bg-blue-600 text-white p-2 rounded max-w-[85%] ml-auto text-right text-xs mb-1">${val}</div>`;
+      // Mensagem do Aluno
+      box.innerHTML += `
+        <div class="bg-blue-600 text-white p-2 rounded-lg max-w-[85%] ml-auto text-right text-xs shadow-sm mb-1">
+          ${query}
+        </div>
+      `;
       input.value = '';
       box.scrollTop = box.scrollHeight;
 
+      // Resposta do Mestre JM
       setTimeout(() => {
-        box.innerHTML += `<div class="bg-blue-50 border border-blue-200 text-blue-900 p-2 rounded max-w-[85%] text-xs mb-1">Para orientações sobre '${val}', acesse o menu Ensino no portal web ou contate a coordenação do CTBJ.</div>`;
+        let response = generateJMResponse(query.toLowerCase());
+        box.innerHTML += `
+          <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-lg max-w-[85%] text-xs shadow-sm mb-1">
+            <p class="font-bold text-[10px] text-blue-800 mb-0.5"><i class="fa-solid fa-robot"></i> Mestre JM:</p>
+            ${response}
+          </div>
+        `;
         box.scrollTop = box.scrollHeight;
-      }, 500);
+      }, 400);
+    }
+
+    function generateJMResponse(q) {
+      if (q.includes('falta') || q.includes('frequencia') || q.includes('ausencia')) {
+        const maisFaltas = [...disciplinas].sort((a,b) => b.faltas - a.faltas)[0];
+        return `Sua disciplina com mais faltas atualmente é <b>${maisFaltas.nome}</b> (${maisFaltas.faltas}/15 faltas). Fique atento para não ultrapassar o limite de 25%!`;
+      } 
+      else if (q.includes('horario') || q.includes('aula') || q.includes('grade') || q.includes('quando')) {
+        return `As aulas ocorrem no turno da **Tarde** no CTBJ (14h às 17h40). Confira a aba **Grade** no menu inferior para ver o quadro completo por dia da semana!`;
+      } 
+      else if (q.includes('nota') || q.includes('media') || q.includes('prova') || q.includes('atividade')) {
+        return `Você pode visualizar os detalhes das avaliações e relatórios clicando na disciplina correspondente dentro da aba **Turmas**!`;
+      } 
+      else if (q.includes('quem') || q.includes('jm') || q.includes('mestre')) {
+        return `Sou o **Mestre JM**, o assistente oficial do SIGAA de Bolso. Meu trabalho é ajudar discentes do CTBJ a gerenciar sua rotina acadêmica sem complicações!`;
+      } 
+      else {
+        return `Compreendido! Como Mestre JM, posso te orientar sobre suas **faltas**, **turmas**, **horários** ou **atividades**. Qual dessas opções você quer consultar agora?`;
+      }
     }
   </script>
 </body>
