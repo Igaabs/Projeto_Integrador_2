@@ -18,6 +18,9 @@
   <!-- FRAME MOBILE DO CELULAR -->
   <div class="w-full max-w-sm bg-white min-h-screen sm:min-h-[720px] sm:max-h-[760px] sm:rounded-3xl shadow-2xl border border-gray-300 flex flex-col justify-between overflow-hidden relative">
 
+    <!-- CONTAINER DE NOTIFICAÇÕES FLUTUANTES (TOASTS) -->
+    <div id="toast-container" class="absolute top-14 left-3 right-3 z-50 space-y-2 pointer-events-none"></div>
+
     <!-- ================= TELA DE LOGIN / CADASTRO ================= -->
     <div id="screen-login" class="flex-1 flex flex-col justify-between p-5 bg-white">
       <div>
@@ -60,7 +63,7 @@
     <div id="screen-app" class="flex-1 hidden flex-col h-full bg-slate-50 overflow-hidden relative">
       
       <!-- Topo Fixo do App -->
-      <header class="sigaa-bg-dark text-white p-3 shadow flex justify-between items-center text-xs">
+      <header class="sigaa-bg-dark text-white p-3 shadow flex justify-between items-center text-xs z-10">
         <div>
           <h2 id="user-display-name" class="font-bold text-xs truncate max-w-[180px]">DISCENTE</h2>
           <p class="text-[10px] text-blue-200">Semestre Atual: <b>2026.2</b></p>
@@ -103,7 +106,7 @@
           </div>
         </section>
 
-        <!-- ABA 3: GRADE DE HORÁRIOS (CONCOMITANTE MÓDULO V) -->
+        <!-- ABA 3: GRADE DE HORÁRIOS -->
         <section id="tab-grade" class="space-y-2 hidden">
           <div class="flex justify-between items-center border-b pb-1">
             <h3 class="font-bold text-xs text-gray-700 uppercase">Grade de Horários</h3>
@@ -195,8 +198,8 @@
 
       </main>
 
-      <!-- MODAL DETALHES DA DISCIPLINA (ATIVIDADES E NOTAS) -->
-      <div id="modal-discipline" class="absolute inset-0 bg-white z-50 hidden flex-col">
+      <!-- MODAL DETALHES DA DISCIPLINA -->
+      <div id="modal-discipline" class="absolute inset-0 bg-white z-40 hidden flex-col">
         
         <!-- Header do Modal -->
         <div class="sigaa-bg-dark text-white p-3 flex justify-between items-center text-xs">
@@ -209,9 +212,9 @@
           </button>
         </div>
 
-        <!-- Alerta de Notificação -->
-        <div id="modal-alert-box" class="bg-amber-100 border-b border-amber-300 p-2.5 flex items-center gap-2 text-amber-900 text-[11px] font-semibold animate-pulse">
-          <i class="fa-solid fa-bell text-amber-600 text-sm"></i>
+        <!-- Banner Interno de Notificação -->
+        <div id="modal-alert-box" class="bg-amber-100 border-b border-amber-300 p-2.5 flex items-center gap-2 text-amber-900 text-[11px] font-semibold">
+          <i class="fa-solid fa-bell text-amber-600 text-sm animate-bounce"></i>
           <span id="modal-alert-text">Nova atividade cadastrada nesta disciplina!</span>
         </div>
 
@@ -285,7 +288,7 @@
       </div>
 
       <!-- Menu de Navegação Inferior (Barra Mobile) -->
-      <nav class="bg-white border-t border-gray-300 flex justify-around py-2 text-[10px] text-gray-500">
+      <nav class="bg-white border-t border-gray-300 flex justify-around py-2 text-[10px] text-gray-500 z-10">
         <button onclick="switchTab('perfil')" id="btn-perfil" class="flex-1 text-center text-blue-800 font-bold">
           <i class="fa-solid fa-id-card text-base block mb-0.5"></i> Perfil
         </button>
@@ -309,7 +312,6 @@
 
   <!-- Lógica JavaScript -->
   <script>
-    // Lista das disciplinas conforme a imagem
     let disciplinas = [
       { id: 1, nome: "BANCO DE DADOS", local: "CTBJ/UFPI038", professor: "Elineide", horario: "2345T4", faltas: 2, limite: 15, atividade: "Trabalho de Modelagem MER/DER" },
       { id: 2, nome: "DESENVOLVIMENTO WEB", local: "CTBJ/UFPI101", professor: "Clécio", horario: "2345T1", faltas: 0, limite: 15, atividade: "Entrega do Layout Responsivo Tailwind" },
@@ -320,6 +322,43 @@
       { id: 7, nome: "PROJETO INTEGRADOR III", local: "CTBJ/UFPI105", professor: "Outro Professor", horario: "345T2", faltas: 1, limite: 15, atividade: "Escopo e Requisitos Iniciais" },
       { id: 8, nome: "SEGURANÇA DA INFORMAÇÃO", local: "CTBJ/UFPI090", professor: "Elineide", horario: "6T74 23N1", faltas: 5, limite: 15, atividade: "Estudo de Caso sobre Criptografia" }
     ];
+
+    // SISTEMA DE NOTIFICAÇÕES FLUTUANTES (TOAST)
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      let bgClass = "bg-blue-900 text-white";
+      let icon = "fa-info-circle";
+
+      if (type === 'warning') {
+        bgClass = "bg-amber-600 text-white";
+        icon = "fa-triangle-exclamation";
+      } else if (type === 'success') {
+        bgClass = "bg-emerald-700 text-white";
+        icon = "fa-circle-check";
+      }
+
+      toast.className = `${bgClass} text-[11px] px-3 py-2 rounded-lg shadow-lg flex items-center justify-between gap-2 transition-all duration-300 opacity-0 -translate-y-2 pointer-events-auto`;
+      toast.innerHTML = `
+        <div class="flex items-center gap-2">
+          <i class="fa-solid ${icon}"></i>
+          <span>${message}</span>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-white opacity-70 hover:opacity-100 text-xs font-bold pl-1">&times;</button>
+      `;
+
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('opacity-0', '-translate-y-2');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
 
     function handleLogin(e) {
       e.preventDefault();
@@ -338,12 +377,14 @@
 
       renderTurmas();
       renderFaltas();
+      showToast(`Bem-vindo, ${nome.split(' ')[0]}!`, 'success');
     }
 
     function logout() {
       document.getElementById('screen-app').classList.add('hidden');
       document.getElementById('screen-app').classList.remove('flex');
       document.getElementById('screen-login').classList.remove('hidden');
+      showToast('Sessão encerrada.', 'info');
     }
 
     function switchTab(tab) {
@@ -411,6 +452,7 @@
       if (disc) {
         disc.faltas += 1;
         renderFaltas();
+        showToast(`+1 falta adicionada em ${disc.nome}`, 'warning');
       }
     }
 
@@ -420,12 +462,13 @@
 
       document.getElementById('modal-disc-title').innerText = disc.nome;
       document.getElementById('modal-disc-sub').innerText = `${disc.professor} • ${disc.local}`;
-      document.getElementById('modal-alert-text').innerText = `Aviso: "${disc.atividade}" foi cadastrada nesta disciplina!`;
+      document.getElementById('modal-alert-text').innerText = `Atividade cadastrada: "${disc.atividade}"`;
 
       document.getElementById('modal-discipline').classList.remove('hidden');
       document.getElementById('modal-discipline').classList.add('flex');
       
       switchSubTab('atividades');
+      showToast(`Atividade nova em ${disc.nome}!`, 'info');
     }
 
     function closeDisciplineModal() {
