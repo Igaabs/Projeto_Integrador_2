@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIGAA de Bolso</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans flex justify-center items-center min-h-screen p-0 sm:p-4">
+
+  <!-- Frame de Celular -->
+  <div class="w-full max-w-md bg-white min-h-screen sm:min-h-[750px] sm:rounded-3xl shadow-2xl flex flex-col justify-between overflow-hidden relative border border-gray-200">
+    
+    <!-- Topo / Header -->
+    <header class="bg-blue-700 text-white p-4 flex justify-between items-center shadow">
+      <div>
+        <h1 class="font-bold text-lg">SIGAA de Bolso</h1>
+        <p class="text-xs text-blue-200">Olá, Aluno (Modo Offline)</p>
+      </div>
+      <span class="bg-green-500 text-xs px-2 py-1 rounded-full text-white font-semibold">Sincronizado</span>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 p-4 overflow-y-auto" id="app-content">
+      
+      <!-- ABA 1: GRADE HORÁRIA -->
+      <section id="tab-grade" class="space-y-3">
+        <h2 class="font-bold text-gray-700 text-base border-b pb-1">Grade Horária da Semana</h2>
+        
+        <div class="bg-blue-50 border-l-4 border-blue-600 p-3 rounded shadow-sm">
+          <p class="text-xs font-bold text-blue-800">SEGUNDA / QUARTA • 08:00 - 10:00</p>
+          <h3 class="font-bold text-gray-800">Projeto Integrador II</h3>
+          <p class="text-xs text-gray-600">Local: Bloco 3 - Sala 204 | Prof. Clécio</p>
+        </div>
+
+        <div class="bg-blue-50 border-l-4 border-blue-600 p-3 rounded shadow-sm">
+          <p class="text-xs font-bold text-blue-800">TERÇA / QUINTA • 10:00 - 12:00</p>
+          <h3 class="font-bold text-gray-800">Estrutura de Dados</h3>
+          <p class="text-xs text-gray-600">Local: Laboratório 02 | Prof. Silva</p>
+        </div>
+      </section>
+
+      <!-- ABA 2: FALTAS -->
+      <section id="tab-faltas" class="space-y-3 hidden">
+        <h2 class="font-bold text-gray-700 text-base border-b pb-1">Termômetro de Faltas</h2>
+        
+        <div class="bg-white border p-3 rounded shadow-sm space-y-2">
+          <div class="flex justify-between text-sm font-semibold">
+            <span>Projeto Integrador II</span>
+            <span class="text-green-600">2 / 15 Faltas</span>
+          </div>
+          <div class="w-full bg-gray-200 h-2.5 rounded-full overflow-hidden">
+            <div class="bg-green-500 h-2.5 rounded-full" style="width: 13%"></div>
+          </div>
+        </div>
+
+        <div class="bg-white border p-3 rounded shadow-sm space-y-2">
+          <div class="flex justify-between text-sm font-semibold">
+            <span>Estrutura de Dados</span>
+            <span class="text-amber-600">8 / 15 Faltas</span>
+          </div>
+          <div class="w-full bg-gray-200 h-2.5 rounded-full overflow-hidden">
+            <div class="bg-amber-500 h-2.5 rounded-full" style="width: 53%"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 3: CHATBOT IA -->
+      <section id="tab-chat" class="space-y-3 hidden flex flex-col h-full">
+        <h2 class="font-bold text-gray-700 text-base border-b pb-1">Assistente Virtual (Gemini)</h2>
+        
+        <div id="chat-messages" class="flex-1 space-y-2 max-h-[420px] overflow-y-auto p-1">
+          <div class="bg-gray-100 p-2.5 rounded-lg text-xs text-gray-800 max-w-[85%]">
+            Olá! Sou o assistente do SIGAA. Como posso te ajudar com regras de matrícula, prazos ou trancamento?
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-2 border-t">
+          <input type="text" id="chat-input" placeholder="Digite sua dúvida..." class="flex-1 border text-xs p-2 rounded-lg outline-none focus:border-blue-600">
+          <button onclick="sendMessage()" class="bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-semibold hover:bg-blue-800">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Navegação Inferior (Menu de Abas) -->
+    <nav class="bg-white border-t flex justify-around p-2 text-center text-xs text-gray-500">
+      <button onclick="switchTab('grade')" id="btn-grade" class="flex-1 py-1 text-blue-700 font-bold">
+        <i class="fa-solid fa-calendar-days text-base block"></i> Grade
+      </button>
+      <button onclick="switchTab('faltas')" id="btn-faltas" class="flex-1 py-1 hover:text-blue-700">
+        <i class="fa-solid fa-chart-line text-base block"></i> Faltas
+      </button>
+      <button onclick="switchTab('chat')" id="btn-chat" class="flex-1 py-1 hover:text-blue-700">
+        <i class="fa-solid fa-robot text-base block"></i> Chatbot IA
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- Lógica de Funcionamento (JavaScript) -->
+  <script>
+    function switchTab(tab) {
+      document.getElementById('tab-grade').classList.add('hidden');
+      document.getElementById('tab-faltas').classList.add('hidden');
+      document.getElementById('tab-chat').classList.add('hidden');
+
+      document.getElementById('btn-grade').className = "flex-1 py-1 text-gray-500";
+      document.getElementById('btn-faltas').className = "flex-1 py-1 text-gray-500";
+      document.getElementById('btn-chat').className = "flex-1 py-1 text-gray-500";
+
+      document.getElementById('tab-' + tab).classList.remove('hidden');
+      document.getElementById('btn-' + tab).className = "flex-1 py-1 text-blue-700 font-bold";
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const messages = document.getElementById('chat-messages');
+      const text = input.value.trim();
+
+      if (!text) return;
+
+      // Mensagem do Usuário
+      messages.innerHTML += `<div class="bg-blue-600 text-white p-2.5 rounded-lg text-xs max-w-[85%] ml-auto text-right">${text}</div>`;
+      input.value = '';
+      messages.scrollTop = messages.scrollHeight;
+
+      // Simulação de resposta da IA
+      setTimeout(() => {
+        messages.innerHTML += `<div class="bg-gray-100 p-2.5 rounded-lg text-xs text-gray-800 max-w-[85%]">Para questões de ${text.toLowerCase()}, você deve acessar o menu 'Ensino' > 'Matrícula' dentro do período estipulado pelo calendário acadêmico.</div>`;
+        messages.scrollTop = messages.scrollHeight;
+      }, 800);
+    }
+  </script>
+</body>
+</html>
