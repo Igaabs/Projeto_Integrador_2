@@ -3,194 +3,172 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIGAA - Sistema Integrado de Gestão de Atividades Acadêmicas</title>
+  <title>SIGAA de Bolso Mobile</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { font-family: Arial, Helvetica, sans-serif; background-color: #f4f6f9; }
+    body { font-family: Arial, Helvetica, sans-serif; background-color: #e2e8f0; }
     .sigaa-bg-dark { background-color: #2b5278; }
     .sigaa-bg-light { background-color: #e8eef5; }
     .sigaa-border { border-color: #b0c4de; }
-    .sigaa-header-table { background-color: #2b5278; color: white; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start p-0 sm:p-2">
+<body class="min-h-screen flex items-center justify-center p-0 sm:p-4">
 
-  <!-- ================= TELA DE LOGIN / CADASTRO ================= -->
-  <div id="screen-login" class="w-full max-w-md bg-white border border-gray-300 rounded shadow-md mt-10 overflow-hidden">
-    <div class="sigaa-bg-dark text-white p-4 text-center">
-      <h1 class="font-bold text-xl">SIGAA de Bolso</h1>
-      <p class="text-xs text-blue-200">Acesso ao Portal Acadêmico Discente</p>
-    </div>
-    
-    <form id="form-login" onsubmit="handleLogin(event)" class="p-6 space-y-4">
-      <div class="text-xs text-gray-600 bg-blue-50 p-2 rounded border border-blue-200">
-        Informe dados fictícios para criar o perfil de teste no MVP.
-      </div>
-      
+  <!-- FRAME MOBILE DO CELULAR -->
+  <div class="w-full max-w-sm bg-white min-h-screen sm:min-h-[700px] sm:max-h-[750px] sm:rounded-3xl shadow-2xl border border-gray-300 flex flex-col justify-between overflow-hidden relative">
+
+    <!-- ================= TELA DE LOGIN / CADASTRO ================= -->
+    <div id="screen-login" class="flex-1 flex flex-col justify-between p-5 bg-white">
       <div>
-        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nome Completo:</label>
-        <input type="text" id="input-nome" required placeholder="Ex: Gabriel Ferreira" class="w-full border p-2 text-sm rounded outline-none focus:border-blue-600">
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Matrícula:</label>
-        <input type="text" id="input-matricula" required placeholder="Ex: 202610123" class="w-full border p-2 text-sm rounded outline-none focus:border-blue-600">
-      </div>
-
-      <div>
-        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Curso / Unidade:</label>
-        <input type="text" id="input-curso" required placeholder="Ex: Colégio Técnico / CTBJ" class="w-full border p-2 text-sm rounded outline-none focus:border-blue-600">
-      </div>
-
-      <button type="submit" class="w-full sigaa-bg-dark text-white font-bold py-2 rounded text-sm hover:opacity-90 transition">
-        Entrar no Sistema
-      </button>
-    </form>
-  </div>
-
-  <!-- ================= TELA PRINCIPAL (PORTAL DISCENTE) ================= -->
-  <div id="screen-portal" class="w-full max-w-5xl bg-white border border-gray-300 shadow-sm hidden flex-col">
-    
-    <!-- Topo Institucional Clássico -->
-    <header class="sigaa-bg-dark text-white p-2 px-4 flex flex-wrap justify-between items-center text-xs">
-      <div>
-        <span id="user-display-name" class="font-bold uppercase">ALUNO</span> 
-        <span class="text-gray-300">| Semestre atual: <b>2026.2</b></span>
-      </div>
-      <div class="space-x-3 mt-1 sm:mt-0">
-        <button onclick="logout()" class="hover:underline"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
-      </div>
-    </header>
-
-    <!-- Barra de Módulos (Menu de Navegação) -->
-    <nav class="sigaa-bg-light border-b sigaa-border p-2 flex gap-2 text-xs font-bold text-blue-900 overflow-x-auto">
-      <button onclick="switchTab('turmas')" id="btn-tab-turmas" class="bg-white border px-3 py-1 rounded shadow-sm">
-        <i class="fa-solid fa-graduation-cap"></i> Ensino / Turmas
-      </button>
-      <button onclick="switchTab('chat')" id="btn-tab-chat" class="hover:bg-white border px-3 py-1 rounded">
-        <i class="fa-solid fa-robot"></i> Assistente Virtual IA
-      </button>
-      <button onclick="switchTab('faltas')" id="btn-tab-faltas" class="hover:bg-white border px-3 py-1 rounded">
-        <i class="fa-solid fa-clipboard-user"></i> Resumo de Faltas
-      </button>
-    </nav>
-
-    <!-- Conteúdo Principal em Duas Colunas -->
-    <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-      
-      <!-- COLUNA DA ESQUERDA (2 Terços): Módulos Principais -->
-      <div class="md:col-span-2 space-y-4">
-        
-        <!-- MÓDULO 1: TURMAS DO SEMESTRE -->
-        <section id="module-turmas" class="space-y-3">
-          <div class="border sigaa-border rounded overflow-hidden">
-            <div class="sigaa-header-table p-2 font-bold text-xs uppercase flex justify-between">
-              <span>Turmas do Semestre</span>
-              <span>Local: CTBJ</span>
-            </div>
-            <table class="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr class="bg-gray-100 border-b">
-                  <th class="p-2 border-r">Componente Curricular</th>
-                  <th class="p-2 border-r">Local</th>
-                  <th class="p-2">Horário</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y text-gray-800">
-                <tr class="hover:bg-blue-50">
-                  <td class="p-2 border-r font-bold text-blue-900">BANCO DE DADOS</td>
-                  <td class="p-2 border-r">CTBJ</td>
-                  <td class="p-2">2345T4</td>
-                </tr>
-                <tr class="hover:bg-blue-50">
-                  <td class="p-2 border-r font-bold text-blue-900">DESENVOLVIMENTO WEB</td>
-                  <td class="p-2 border-r">CTBJ</td>
-                  <td class="p-2">2345T1</td>
-                </tr>
-                <tr class="hover:bg-blue-50">
-                  <td class="p-2 border-r font-bold text-blue-900">PROJETO INTEGRADOR II</td>
-                  <td class="p-2 border-r">CTBJ</td>
-                  <td class="p-2">2T2 6T1</td>
-                </tr>
-                <tr class="hover:bg-blue-50">
-                  <td class="p-2 border-r font-bold text-blue-900">SEGURANÇA DA INFORMAÇÃO</td>
-                  <td class="p-2 border-r">CTBJ</td>
-                  <td class="p-2">6T74 23N1</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- MÓDULO 2: CHATBOT IA -->
-        <section id="module-chat" class="space-y-2 hidden">
-          <div class="border sigaa-border rounded overflow-hidden">
-            <div class="sigaa-header-table p-2 font-bold text-xs uppercase">
-              Assistente Virtual do Discente (Integração Gemini IA)
-            </div>
-            <div id="chat-box" class="p-3 h-64 overflow-y-auto space-y-2 bg-gray-50 text-xs">
-              <div class="bg-blue-100 text-blue-900 p-2 rounded max-w-[85%] border border-blue-200">
-                Olá! Sou o assistente acadêmico. Como posso ajudar com dúvidas sobre prazos, normas ou turmas?
-              </div>
-            </div>
-            <div class="p-2 border-t flex gap-2 bg-white">
-              <input type="text" id="chat-input" placeholder="Digite sua dúvida acadêmica..." class="flex-1 border p-1.5 text-xs rounded outline-none">
-              <button onclick="sendChatMessage()" class="sigaa-bg-dark text-white px-3 py-1.5 rounded text-xs font-bold">Enviar</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- MÓDULO 3: RESUMO DE FALTAS -->
-        <section id="module-faltas" class="space-y-2 hidden">
-          <div class="border sigaa-border rounded overflow-hidden">
-            <div class="sigaa-header-table p-2 font-bold text-xs uppercase">
-              Acompanhamento de Frequência
-            </div>
-            <div class="p-3 bg-white space-y-3 text-xs">
-              <div>
-                <div class="flex justify-between mb-1">
-                  <span class="font-bold">PROJETO INTEGRADOR II</span>
-                  <span class="text-green-700 font-bold">2 Faltas (13% do limite)</span>
-                </div>
-                <div class="w-full bg-gray-200 h-2 rounded"><div class="bg-green-600 h-2 rounded" style="width: 13%"></div></div>
-              </div>
-              <div>
-                <div class="flex justify-between mb-1">
-                  <span class="font-bold">BANCO DE DADOS</span>
-                  <span class="text-amber-600 font-bold">6 Faltas (40% do limite)</span>
-                </div>
-                <div class="w-full bg-gray-200 h-2 rounded"><div class="bg-amber-500 h-2 rounded" style="width: 40%"></div></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-      </div>
-
-      <!-- COLUNA DA DIREITA (1 Terço): Perfil e Dados Institucionais -->
-      <aside class="space-y-4">
-        <div class="border sigaa-border rounded p-3 bg-blue-50/50 text-xs text-center space-y-2">
-          <div class="w-20 h-24 bg-gray-300 mx-auto border flex items-center justify-center text-gray-600">
-            <i class="fa-solid fa-user text-3xl"></i>
-          </div>
-          <p id="profile-name" class="font-bold text-blue-900 uppercase">NOME DO ALUNO</p>
+        <div class="sigaa-bg-dark text-white p-4 -mx-5 -mt-5 mb-6 text-center shadow-md">
+          <i class="fa-solid fa-graduation-cap text-3xl mb-1"></i>
+          <h1 class="font-bold text-lg">SIGAA de Bolso</h1>
+          <p class="text-xs text-blue-200">Portal Discente Mobile</p>
         </div>
 
-        <div class="border sigaa-border rounded p-3 bg-white text-xs space-y-1.5">
-          <h3 class="font-bold text-blue-900 border-b pb-1 mb-2">Dados Institucionais</h3>
-          <p><b>Matrícula:</b> <span id="profile-matricula">20260000</span></p>
-          <p><b>Curso:</b> <span id="profile-curso">Técnico</span></p>
-          <p><b>Status:</b> <span class="text-green-700 font-bold">ATIVO</span></p>
-          <p><b>Entrada:</b> 2026.1</p>
+        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+          <div class="text-[11px] text-gray-600 bg-blue-50 p-2.5 rounded border border-blue-200">
+            Cadastre os dados do discente para acessar o ambiente móvel do MVP.
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Nome Completo:</label>
+            <input type="text" id="input-nome" required value="GABRIEL FERREIRA PIAUILINO" class="w-full border p-2 text-xs rounded outline-none focus:border-blue-700">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Matrícula:</label>
+            <input type="text" id="input-matricula" required value="202410112" class="w-full border p-2 text-xs rounded outline-none focus:border-blue-700">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Unidade / Curso:</label>
+            <input type="text" id="input-curso" required value="COLÉGIO TÉCNICO DE BOM JESUS (CTBJ)" class="w-full border p-2 text-xs rounded outline-none focus:border-blue-700">
+          </div>
+
+          <button type="submit" class="w-full sigaa-bg-dark text-white font-bold py-2.5 rounded text-xs shadow hover:opacity-90 transition mt-2">
+            Entrar no Portal Mobile
+          </button>
+        </form>
+      </div>
+
+      <p class="text-[10px] text-center text-gray-400 mt-4">SIGAA de Bolso • Projeto Integrador II</p>
+    </div>
+
+    <!-- ================= TELA PRINCIPAL (APP MOBILE) ================= -->
+    <div id="screen-app" class="flex-1 hidden flex-col h-full bg-slate-50 overflow-hidden">
+      
+      <!-- Topo Fixo do App -->
+      <header class="sigaa-bg-dark text-white p-3 shadow flex justify-between items-center text-xs">
+        <div>
+          <h2 id="user-display-name" class="font-bold text-xs truncate max-w-[180px]">DISCENTE</h2>
+          <p class="text-[10px] text-blue-200">Semestre Atual: <b>2026.2</b></p>
         </div>
-      </aside>
+        <button onclick="logout()" class="text-[11px] bg-blue-900 px-2 py-1 rounded text-blue-100 hover:bg-blue-800">
+          <i class="fa-solid fa-right-from-bracket"></i> Sair
+        </button>
+      </header>
+
+      <!-- Conteúdo das Abas (Scrollável) -->
+      <main class="flex-1 overflow-y-auto p-3 space-y-3">
+
+        <!-- ABA 1: DISCENTE (PERFIL) -->
+        <section id="tab-perfil" class="space-y-3">
+          <div class="bg-white border sigaa-border rounded p-3 text-center space-y-2 shadow-sm">
+            <div class="w-16 h-20 bg-gray-200 border mx-auto flex items-center justify-center text-gray-500 rounded">
+              <i class="fa-solid fa-user text-2xl"></i>
+            </div>
+            <p id="profile-name" class="font-bold text-xs text-blue-900 uppercase">NOME DO ALUNO</p>
+          </div>
+
+          <div class="bg-white border sigaa-border rounded p-3 text-xs space-y-1.5 shadow-sm">
+            <h3 class="font-bold text-blue-900 border-b pb-1 text-[11px] uppercase">Dados Institucionais</h3>
+            <p><b>Matrícula:</b> <span id="profile-matricula">000000</span></p>
+            <p><b>Unidade:</b> <span id="profile-curso">CTBJ</span></p>
+            <p><b>Status:</b> <span class="text-green-700 font-bold">ATIVO</span></p>
+            <p><b>Entrada:</b> 2024.1</p>
+          </div>
+        </section>
+
+        <!-- ABA 2: TURMAS DO SEMESTRE -->
+        <section id="tab-turmas" class="space-y-2 hidden">
+          <div class="flex justify-between items-center border-b pb-1">
+            <h3 class="font-bold text-xs text-gray-700 uppercase">Turmas do Semestre</h3>
+            <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">Local: CTBJ</span>
+          </div>
+
+          <div id="turmas-list" class="space-y-2">
+            <!-- Renderizado dinamicamente via JS -->
+          </div>
+        </section>
+
+        <!-- ABA 3: TERMÔMETRO DE FALTAS -->
+        <section id="tab-faltas" class="space-y-2 hidden">
+          <div class="flex justify-between items-center border-b pb-1">
+            <h3 class="font-bold text-xs text-gray-700 uppercase">Termômetro de Faltas</h3>
+            <span class="text-[10px] text-gray-500">Limite: 15 Faltas</span>
+          </div>
+
+          <div id="faltas-list" class="space-y-2.5">
+            <!-- Renderizado dinamicamente via JS -->
+          </div>
+        </section>
+
+        <!-- ABA 4: CHATBOT IA -->
+        <section id="tab-chat" class="space-y-2 hidden flex flex-col h-full min-h-[350px]">
+          <h3 class="font-bold text-xs text-gray-700 border-b pb-1 uppercase">Assistente Virtual (Gemini IA)</h3>
+          
+          <div id="chat-messages" class="flex-1 bg-white border sigaa-border rounded p-2.5 overflow-y-auto text-xs space-y-2 max-h-[280px]">
+            <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2 rounded max-w-[90%]">
+              Olá! Sou seu assistente do SIGAA. Tire dúvidas sobre processos de matrícula, prazos ou trancamento.
+            </div>
+          </div>
+
+          <div class="flex gap-1.5 pt-1">
+            <input type="text" id="chat-input" placeholder="Digite sua dúvida..." class="flex-1 border p-2 text-xs rounded outline-none focus:border-blue-700">
+            <button onclick="sendChatMessage()" class="sigaa-bg-dark text-white px-3 py-2 rounded text-xs font-bold">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Menu de Navegação Inferior (Barra Mobile) -->
+      <nav class="bg-white border-t border-gray-300 flex justify-around py-2 text-[10px] text-gray-500">
+        <button onclick="switchTab('perfil')" id="btn-perfil" class="flex-1 text-center text-blue-800 font-bold">
+          <i class="fa-solid fa-id-card text-base block mb-0.5"></i> Discente
+        </button>
+        <button onclick="switchTab('turmas')" id="btn-turmas" class="flex-1 text-center hover:text-blue-800">
+          <i class="fa-solid fa-book-bookmark text-base block mb-0.5"></i> Turmas
+        </button>
+        <button onclick="switchTab('faltas')" id="btn-faltas" class="flex-1 text-center hover:text-blue-800">
+          <i class="fa-solid fa-clipboard-user text-base block mb-0.5"></i> Faltas
+        </button>
+        <button onclick="switchTab('chat')" id="btn-chat" class="flex-1 text-center hover:text-blue-800">
+          <i class="fa-solid fa-robot text-base block mb-0.5"></i> Chat IA
+        </button>
+      </nav>
 
     </div>
+
   </div>
 
-  <!-- Lógica JavaScript de Navegação e Dados -->
+  <!-- Lógica JavaScript -->
   <script>
+    // Lista completa das disciplinas extraídas da imagem oficial
+    let disciplinas = [
+      { id: 1, nome: "BANCO DE DADOS", local: "CTBJ", horario: "2345T4", faltas: 2, limite: 15 },
+      { id: 2, nome: "DESENVOLVIMENTO WEB", local: "CTBJ", horario: "2345T1", faltas: 0, limite: 15 },
+      { id: 3, nome: "EMPREENDEDORISMO", local: "CTBJ", horario: "56M4", faltas: 1, limite: 15 },
+      { id: 4, nome: "LABORATÓRIO DE BANCO DE DADOS", local: "CTBJ", horario: "234N2", faltas: 3, limite: 15 },
+      { id: 5, nome: "LABORATÓRIO DE PROGRAMAÇÃO", local: "CTBJ", horario: "4567N1", faltas: 0, limite: 15 },
+      { id: 6, nome: "PROJETO INTEGRADOR II", local: "CTBJ", horario: "2T2 6T1", faltas: 2, limite: 15 },
+      { id: 7, nome: "PROJETO INTEGRADOR III", local: "CTBJ", horario: "345T2", faltas: 1, limite: 15 },
+      { id: 8, nome: "SEGURANÇA DA INFORMAÇÃO", local: "CTBJ", horario: "6T74 23N1", faltas: 5, limite: 15 }
+    ];
+
     function handleLogin(e) {
       e.preventDefault();
       const nome = document.getElementById('input-nome').value;
@@ -203,43 +181,98 @@
       document.getElementById('profile-curso').innerText = curso;
 
       document.getElementById('screen-login').classList.add('hidden');
-      document.getElementById('screen-portal').classList.remove('hidden');
-      document.getElementById('screen-portal').classList.add('flex');
+      document.getElementById('screen-app').classList.remove('hidden');
+      document.getElementById('screen-app').classList.add('flex');
+
+      renderTurmas();
+      renderFaltas();
     }
 
     function logout() {
-      document.getElementById('screen-portal').classList.add('hidden');
-      document.getElementById('screen-portal').classList.remove('flex');
+      document.getElementById('screen-app').classList.add('hidden');
+      document.getElementById('screen-app').classList.remove('flex');
       document.getElementById('screen-login').classList.remove('hidden');
     }
 
     function switchTab(tab) {
-      document.getElementById('module-turmas').classList.add('hidden');
-      document.getElementById('module-chat').classList.add('hidden');
-      document.getElementById('module-faltas').classList.add('hidden');
+      ['perfil', 'turmas', 'faltas', 'chat'].forEach(t => {
+        document.getElementById('tab-' + t).classList.add('hidden');
+        document.getElementById('btn-' + t).className = "flex-1 text-center text-gray-500 hover:text-blue-800";
+      });
 
-      document.getElementById('btn-tab-turmas').className = "hover:bg-white border px-3 py-1 rounded";
-      document.getElementById('btn-tab-chat').className = "hover:bg-white border px-3 py-1 rounded";
-      document.getElementById('btn-tab-faltas').className = "hover:bg-white border px-3 py-1 rounded";
+      document.getElementById('tab-' + tab).classList.remove('hidden');
+      document.getElementById('btn-' + tab).className = "flex-1 text-center text-blue-800 font-bold";
+    }
 
-      document.getElementById('module-' + tab).classList.remove('hidden');
-      document.getElementById('btn-tab-' + tab).className = "bg-white border px-3 py-1 rounded shadow-sm font-bold";
+    function renderTurmas() {
+      const container = document.getElementById('turmas-list');
+      container.innerHTML = '';
+      disciplinas.forEach(d => {
+        container.innerHTML += `
+          <div class="bg-white border sigaa-border p-2.5 rounded shadow-sm text-xs">
+            <h4 class="font-bold text-blue-900 border-b pb-1 mb-1">${d.nome}</h4>
+            <div class="flex justify-between text-[11px] text-gray-600">
+              <span><b>Local:</b> ${d.local}</span>
+              <span><b>Horário:</b> ${d.horario}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderFaltas() {
+      const container = document.getElementById('faltas-list');
+      container.innerHTML = '';
+      disciplinas.forEach(d => {
+        const pct = Math.min(Math.round((d.faltas / d.limite) * 100), 100);
+        let colorClass = "bg-green-500";
+        if (pct >= 50 && pct < 75) colorClass = "bg-amber-500";
+        if (pct >= 75) colorClass = "bg-red-600";
+
+        container.innerHTML += `
+          <div class="bg-white border sigaa-border p-2.5 rounded shadow-sm space-y-1.5 text-xs">
+            <div class="flex justify-between items-start">
+              <h4 class="font-bold text-gray-800 text-[11px] max-w-[200px]">${d.nome}</h4>
+              <button onclick="registrarFalta(${d.id})" class="bg-blue-100 text-blue-800 hover:bg-blue-200 text-[10px] px-2 py-0.5 rounded font-bold border border-blue-300">
+                +1 Falta
+              </button>
+            </div>
+            
+            <div class="flex justify-between text-[11px]">
+              <span class="text-gray-600">Faltas: <b>${d.faltas}</b> / ${d.limite}</span>
+              <span class="font-bold text-gray-700">${pct}%</span>
+            </div>
+
+            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+              <div class="${colorClass} h-2 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function registrarFalta(id) {
+      const disc = disciplinas.find(d => d.id === id);
+      if (disc) {
+        disc.faltas += 1;
+        renderFaltas();
+      }
     }
 
     function sendChatMessage() {
       const input = document.getElementById('chat-input');
-      const box = document.getElementById('chat-box');
+      const box = document.getElementById('chat-messages');
       const val = input.value.trim();
       if (!val) return;
 
-      box.innerHTML += `<div class="bg-gray-200 text-gray-800 p-2 rounded max-w-[85%] ml-auto text-right mb-2">${val}</div>`;
+      box.innerHTML += `<div class="bg-blue-600 text-white p-2 rounded max-w-[85%] ml-auto text-right text-xs mb-1">${val}</div>`;
       input.value = '';
       box.scrollTop = box.scrollHeight;
 
       setTimeout(() => {
-        box.innerHTML += `<div class="bg-blue-100 text-blue-900 p-2 rounded max-w-[85%] border border-blue-200 mb-2">Para consultar orientações sobre '${val}', acesse o menu Ensino ou verifique o calendário acadêmico vigente.</div>`;
+        box.innerHTML += `<div class="bg-blue-50 border border-blue-200 text-blue-900 p-2 rounded max-w-[85%] text-xs mb-1">Para orientações sobre '${val}', acesse o menu Ensino no portal web ou contate a coordenação do CTBJ.</div>`;
         box.scrollTop = box.scrollHeight;
-      }, 600);
+      }, 500);
     }
   </script>
 </body>
