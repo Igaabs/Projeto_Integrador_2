@@ -16,7 +16,7 @@
 <body class="min-h-screen flex items-center justify-center p-0 sm:p-4">
 
   <!-- FRAME MOBILE DO CELULAR -->
-  <div class="w-full max-w-sm bg-white min-h-screen sm:min-h-[700px] sm:max-h-[750px] sm:rounded-3xl shadow-2xl border border-gray-300 flex flex-col justify-between overflow-hidden relative">
+  <div class="w-full max-w-sm bg-white min-h-screen sm:min-h-[720px] sm:max-h-[760px] sm:rounded-3xl shadow-2xl border border-gray-300 flex flex-col justify-between overflow-hidden relative">
 
     <!-- ================= TELA DE LOGIN / CADASTRO ================= -->
     <div id="screen-login" class="flex-1 flex flex-col justify-between p-5 bg-white">
@@ -57,7 +57,7 @@
     </div>
 
     <!-- ================= TELA PRINCIPAL (APP MOBILE) ================= -->
-    <div id="screen-app" class="flex-1 hidden flex-col h-full bg-slate-50 overflow-hidden">
+    <div id="screen-app" class="flex-1 hidden flex-col h-full bg-slate-50 overflow-hidden relative">
       
       <!-- Topo Fixo do App -->
       <header class="sigaa-bg-dark text-white p-3 shadow flex justify-between items-center text-xs">
@@ -95,7 +95,7 @@
         <section id="tab-turmas" class="space-y-2 hidden">
           <div class="flex justify-between items-center border-b pb-1">
             <h3 class="font-bold text-xs text-gray-700 uppercase">Turmas do Semestre</h3>
-            <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">Local: CTBJ</span>
+            <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">Toque para abrir</span>
           </div>
 
           <div id="turmas-list" class="space-y-2">
@@ -103,7 +103,67 @@
           </div>
         </section>
 
-        <!-- ABA 3: TERMÔMETRO DE FALTAS -->
+        <!-- ABA 3: GRADE DE HORÁRIOS (CONCOMITANTE MÓDULO V) -->
+        <section id="tab-grade" class="space-y-2 hidden">
+          <div class="flex justify-between items-center border-b pb-1">
+            <h3 class="font-bold text-xs text-gray-700 uppercase">Grade de Horários</h3>
+            <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">Módulo V (Tarde)</span>
+          </div>
+
+          <div class="overflow-x-auto border sigaa-border rounded bg-white shadow-sm">
+            <table class="w-full text-[10px] text-center border-collapse">
+              <thead>
+                <tr class="sigaa-bg-dark text-white font-bold">
+                  <th class="p-1 border border-blue-900 min-w-[55px]">Horário</th>
+                  <th class="p-1 border border-blue-900">Seg</th>
+                  <th class="p-1 border border-blue-900">Ter</th>
+                  <th class="p-1 border border-blue-900">Qua</th>
+                  <th class="p-1 border border-blue-900">Qui</th>
+                  <th class="p-1 border border-blue-900">Sex</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-gray-800">
+                <tr>
+                  <td class="p-1 font-bold bg-gray-100 border">14h-14h50</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Seg. Inform.</td>
+                  <td class="p-1 bg-blue-100 text-[9px] font-semibold border">PI II</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Banco Dados</td>
+                  <td class="p-1 bg-amber-100 text-[9px] font-semibold border">Empreend.</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Lab. Prog.</td>
+                </tr>
+                <tr>
+                  <td class="p-1 font-bold bg-gray-100 border">14h50-15h40</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Seg. Inform.</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Seg. Inform.</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Banco Dados</td>
+                  <td class="p-1 bg-amber-100 text-[9px] font-semibold border">Empreend.</td>
+                  <td class="p-1 bg-gray-50 border text-gray-400">-</td>
+                </tr>
+                <tr class="bg-gray-200 text-gray-600 font-bold">
+                  <td class="p-1 border text-[9px]" colspan="6">INTERVALO (15h40 - 16h)</td>
+                </tr>
+                <tr>
+                  <td class="p-1 font-bold bg-gray-100 border">16h-16h50</td>
+                  <td class="p-1 bg-yellow-100 text-[9px] font-semibold border">Dev. Web</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Lab. Prog.</td>
+                  <td class="p-1 bg-blue-100 text-[9px] font-semibold border">PI II</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Lab. BD</td>
+                  <td class="p-1 bg-blue-50 text-[9px] font-semibold border">PI III</td>
+                </tr>
+                <tr>
+                  <td class="p-1 font-bold bg-gray-100 border">16h50-17h40</td>
+                  <td class="p-1 bg-yellow-100 text-[9px] font-semibold border">Dev. Web</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Lab. Prog.</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Banco Dados</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Lab. BD</td>
+                  <td class="p-1 bg-blue-50 text-[9px] font-semibold border">PI III</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ABA 4: TERMÔMETRO DE FALTAS -->
         <section id="tab-faltas" class="space-y-2 hidden">
           <div class="flex justify-between items-center border-b pb-1">
             <h3 class="font-bold text-xs text-gray-700 uppercase">Termômetro de Faltas</h3>
@@ -115,13 +175,13 @@
           </div>
         </section>
 
-        <!-- ABA 4: CHATBOT IA -->
+        <!-- ABA 5: CHATBOT IA -->
         <section id="tab-chat" class="space-y-2 hidden flex flex-col h-full min-h-[350px]">
           <h3 class="font-bold text-xs text-gray-700 border-b pb-1 uppercase">Assistente Virtual (Gemini IA)</h3>
           
           <div id="chat-messages" class="flex-1 bg-white border sigaa-border rounded p-2.5 overflow-y-auto text-xs space-y-2 max-h-[280px]">
             <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2 rounded max-w-[90%]">
-              Olá! Sou seu assistente do SIGAA. Tire dúvidas sobre processos de matrícula, prazos ou trancamento.
+              Olá! Sou seu assistente do SIGAA. Tire dúvidas sobre processos de matrícula, prazos ou disciplinas.
             </div>
           </div>
 
@@ -135,13 +195,105 @@
 
       </main>
 
+      <!-- MODAL DETALHES DA DISCIPLINA (ATIVIDADES E NOTAS) -->
+      <div id="modal-discipline" class="absolute inset-0 bg-white z-50 hidden flex-col">
+        
+        <!-- Header do Modal -->
+        <div class="sigaa-bg-dark text-white p-3 flex justify-between items-center text-xs">
+          <div>
+            <h3 id="modal-disc-title" class="font-bold text-xs uppercase">NOME DA DISCIPLINA</h3>
+            <p id="modal-disc-sub" class="text-[10px] text-blue-200">Professor • Local</p>
+          </div>
+          <button onclick="closeDisciplineModal()" class="text-white text-base px-2">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Alerta de Notificação -->
+        <div id="modal-alert-box" class="bg-amber-100 border-b border-amber-300 p-2.5 flex items-center gap-2 text-amber-900 text-[11px] font-semibold animate-pulse">
+          <i class="fa-solid fa-bell text-amber-600 text-sm"></i>
+          <span id="modal-alert-text">Nova atividade cadastrada nesta disciplina!</span>
+        </div>
+
+        <!-- Navegação Interna do Modal -->
+        <div class="flex border-b border-gray-300 text-xs bg-gray-100 font-bold text-gray-600">
+          <button id="btn-subtab-atividades" onclick="switchSubTab('atividades')" class="flex-1 py-2 text-center text-blue-900 border-b-2 border-blue-800 bg-white">
+            Atividades
+          </button>
+          <button id="btn-subtab-notas" onclick="switchSubTab('notas')" class="flex-1 py-2 text-center hover:bg-gray-200">
+            Notas
+          </button>
+        </div>
+
+        <!-- Conteúdo Interno do Modal -->
+        <div class="flex-1 p-3 overflow-y-auto space-y-3 text-xs bg-slate-50">
+          
+          <!-- SUB-ABA ATIVIDADES -->
+          <div id="subtab-atividades" class="space-y-2">
+            <div class="bg-white border p-2.5 rounded shadow-sm">
+              <div class="flex justify-between items-start mb-1">
+                <span class="font-bold text-blue-900 text-[11px]">Trabalho Prático - MVP</span>
+                <span class="bg-red-100 text-red-700 text-[9px] px-1.5 py-0.5 rounded font-bold">Pendente</span>
+              </div>
+              <p class="text-gray-600 text-[10px]">Entrega do relatório técnico e código fonte no GitHub.</p>
+              <p class="text-gray-400 text-[10px] mt-1"><b>Prazo:</b> 25/09/2026 às 23:59</p>
+            </div>
+
+            <div class="bg-white border p-2.5 rounded shadow-sm">
+              <div class="flex justify-between items-start mb-1">
+                <span class="font-bold text-blue-900 text-[11px]">Questionário Individual #1</span>
+                <span class="bg-green-100 text-green-700 text-[9px] px-1.5 py-0.5 rounded font-bold">Entregue</span>
+              </div>
+              <p class="text-gray-600 text-[10px]">Atendimento aos requisitos funcionais e arquitetura.</p>
+              <p class="text-gray-400 text-[10px] mt-1"><b>Prazo:</b> 10/09/2026</p>
+            </div>
+          </div>
+
+          <!-- SUB-ABA NOTAS -->
+          <div id="subtab-notas" class="space-y-2 hidden">
+            <div class="bg-white border sigaa-border rounded overflow-hidden shadow-sm">
+              <table class="w-full text-center text-xs">
+                <thead>
+                  <tr class="bg-gray-100 border-b text-gray-700">
+                    <th class="p-2 text-left">Avaliação</th>
+                    <th class="p-2">Peso</th>
+                    <th class="p-2">Nota</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y text-gray-800">
+                  <tr>
+                    <td class="p-2 text-left font-semibold">Avaliação N1</td>
+                    <td class="p-2">4.0</td>
+                    <td class="p-2 font-bold text-green-700">8.5</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 text-left font-semibold">Avaliação N2</td>
+                    <td class="p-2">6.0</td>
+                    <td class="p-2 font-bold text-green-700">9.0</td>
+                  </tr>
+                  <tr class="bg-blue-50 font-bold">
+                    <td class="p-2 text-left text-blue-900">Média Parcial</td>
+                    <td class="p-2">-</td>
+                    <td class="p-2 text-blue-900">8.8</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       <!-- Menu de Navegação Inferior (Barra Mobile) -->
       <nav class="bg-white border-t border-gray-300 flex justify-around py-2 text-[10px] text-gray-500">
         <button onclick="switchTab('perfil')" id="btn-perfil" class="flex-1 text-center text-blue-800 font-bold">
-          <i class="fa-solid fa-id-card text-base block mb-0.5"></i> Discente
+          <i class="fa-solid fa-id-card text-base block mb-0.5"></i> Perfil
         </button>
         <button onclick="switchTab('turmas')" id="btn-turmas" class="flex-1 text-center hover:text-blue-800">
           <i class="fa-solid fa-book-bookmark text-base block mb-0.5"></i> Turmas
+        </button>
+        <button onclick="switchTab('grade')" id="btn-grade" class="flex-1 text-center hover:text-blue-800">
+          <i class="fa-solid fa-calendar-days text-base block mb-0.5"></i> Grade
         </button>
         <button onclick="switchTab('faltas')" id="btn-faltas" class="flex-1 text-center hover:text-blue-800">
           <i class="fa-solid fa-clipboard-user text-base block mb-0.5"></i> Faltas
@@ -157,16 +309,16 @@
 
   <!-- Lógica JavaScript -->
   <script>
-    // Lista completa das disciplinas extraídas da imagem oficial
+    // Lista das disciplinas conforme a imagem
     let disciplinas = [
-      { id: 1, nome: "BANCO DE DADOS", local: "CTBJ", horario: "2345T4", faltas: 2, limite: 15 },
-      { id: 2, nome: "DESENVOLVIMENTO WEB", local: "CTBJ", horario: "2345T1", faltas: 0, limite: 15 },
-      { id: 3, nome: "EMPREENDEDORISMO", local: "CTBJ", horario: "56M4", faltas: 1, limite: 15 },
-      { id: 4, nome: "LABORATÓRIO DE BANCO DE DADOS", local: "CTBJ", horario: "234N2", faltas: 3, limite: 15 },
-      { id: 5, nome: "LABORATÓRIO DE PROGRAMAÇÃO", local: "CTBJ", horario: "4567N1", faltas: 0, limite: 15 },
-      { id: 6, nome: "PROJETO INTEGRADOR II", local: "CTBJ", horario: "2T2 6T1", faltas: 2, limite: 15 },
-      { id: 7, nome: "PROJETO INTEGRADOR III", local: "CTBJ", horario: "345T2", faltas: 1, limite: 15 },
-      { id: 8, nome: "SEGURANÇA DA INFORMAÇÃO", local: "CTBJ", horario: "6T74 23N1", faltas: 5, limite: 15 }
+      { id: 1, nome: "BANCO DE DADOS", local: "CTBJ/UFPI038", professor: "Elineide", horario: "2345T4", faltas: 2, limite: 15, atividade: "Trabalho de Modelagem MER/DER" },
+      { id: 2, nome: "DESENVOLVIMENTO WEB", local: "CTBJ/UFPI101", professor: "Clécio", horario: "2345T1", faltas: 0, limite: 15, atividade: "Entrega do Layout Responsivo Tailwind" },
+      { id: 3, nome: "EMPREENDEDORISMO", local: "CTBJ/UFPI044", professor: "Filipe", horario: "56M4", faltas: 1, limite: 15, atividade: "Apresentação do Pitch do Projeto" },
+      { id: 4, nome: "LABORATÓRIO DE BANCO DE DADOS", local: "CTBJ/UFPI202", professor: "Elineide", horario: "234N2", faltas: 3, limite: 15, atividade: "Script SQL para Criação de Tabelas" },
+      { id: 5, nome: "LABORATÓRIO DE PROGRAMAÇÃO", local: "CTBJ/UFPI206", professor: "Elineide", horario: "4567N1", faltas: 0, limite: 15, atividade: "Exercício Prático de Lógica em JS" },
+      { id: 6, nome: "PROJETO INTEGRADOR II", local: "CTBJ/UFPI105", professor: "Clécio", horario: "2T2 6T1", faltas: 2, limite: 15, atividade: "Relatório de Testes e Validação (/docs/testes.md)" },
+      { id: 7, nome: "PROJETO INTEGRADOR III", local: "CTBJ/UFPI105", professor: "Outro Professor", horario: "345T2", faltas: 1, limite: 15, atividade: "Escopo e Requisitos Iniciais" },
+      { id: 8, nome: "SEGURANÇA DA INFORMAÇÃO", local: "CTBJ/UFPI090", professor: "Elineide", horario: "6T74 23N1", faltas: 5, limite: 15, atividade: "Estudo de Caso sobre Criptografia" }
     ];
 
     function handleLogin(e) {
@@ -195,7 +347,7 @@
     }
 
     function switchTab(tab) {
-      ['perfil', 'turmas', 'faltas', 'chat'].forEach(t => {
+      ['perfil', 'turmas', 'grade', 'faltas', 'chat'].forEach(t => {
         document.getElementById('tab-' + t).classList.add('hidden');
         document.getElementById('btn-' + t).className = "flex-1 text-center text-gray-500 hover:text-blue-800";
       });
@@ -209,11 +361,14 @@
       container.innerHTML = '';
       disciplinas.forEach(d => {
         container.innerHTML += `
-          <div class="bg-white border sigaa-border p-2.5 rounded shadow-sm text-xs">
-            <h4 class="font-bold text-blue-900 border-b pb-1 mb-1">${d.nome}</h4>
-            <div class="flex justify-between text-[11px] text-gray-600">
+          <div onclick="openDisciplineModal(${d.id})" class="bg-white border sigaa-border p-2.5 rounded shadow-sm text-xs cursor-pointer hover:border-blue-700 transition">
+            <div class="flex justify-between items-center border-b pb-1 mb-1">
+              <h4 class="font-bold text-blue-900">${d.nome}</h4>
+              <i class="fa-solid fa-chevron-right text-gray-400 text-[10px]"></i>
+            </div>
+            <div class="flex justify-between text-[10px] text-gray-600">
+              <span><b>Prof:</b> ${d.professor}</span>
               <span><b>Local:</b> ${d.local}</span>
-              <span><b>Horário:</b> ${d.horario}</span>
             </div>
           </div>
         `;
@@ -257,6 +412,36 @@
         disc.faltas += 1;
         renderFaltas();
       }
+    }
+
+    function openDisciplineModal(id) {
+      const disc = disciplinas.find(d => d.id === id);
+      if (!disc) return;
+
+      document.getElementById('modal-disc-title').innerText = disc.nome;
+      document.getElementById('modal-disc-sub').innerText = `${disc.professor} • ${disc.local}`;
+      document.getElementById('modal-alert-text').innerText = `Aviso: "${disc.atividade}" foi cadastrada nesta disciplina!`;
+
+      document.getElementById('modal-discipline').classList.remove('hidden');
+      document.getElementById('modal-discipline').classList.add('flex');
+      
+      switchSubTab('atividades');
+    }
+
+    function closeDisciplineModal() {
+      document.getElementById('modal-discipline').classList.add('hidden');
+      document.getElementById('modal-discipline').classList.remove('flex');
+    }
+
+    function switchSubTab(sub) {
+      document.getElementById('subtab-atividades').classList.add('hidden');
+      document.getElementById('subtab-notas').classList.add('hidden');
+
+      document.getElementById('btn-subtab-atividades').className = "flex-1 py-2 text-center hover:bg-gray-200";
+      document.getElementById('btn-subtab-notas').className = "flex-1 py-2 text-center hover:bg-gray-200";
+
+      document.getElementById('subtab-' + sub).classList.remove('hidden');
+      document.getElementById('btn-subtab-' + sub).className = "flex-1 py-2 text-center text-blue-900 border-b-2 border-blue-800 bg-white font-bold";
     }
 
     function sendChatMessage() {
