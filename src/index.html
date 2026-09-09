@@ -92,6 +92,15 @@
             <p><b>Status:</b> <span class="text-green-700 font-bold">ATIVO</span></p>
             <p><b>Entrada:</b> 2024.1</p>
           </div>
+
+          <!-- Gerenciamento de Armazenamento Local -->
+          <div class="bg-white border sigaa-border rounded p-3 text-xs space-y-2 shadow-sm">
+            <h3 class="font-bold text-gray-700 border-b pb-1 text-[11px] uppercase">Armazenamento Local</h3>
+            <p class="text-[10px] text-gray-500">Seus dados e faltas estão salvos neste dispositivo.</p>
+            <button onclick="resetarDados()" class="w-full bg-red-100 text-red-700 border border-red-300 font-bold py-1.5 rounded text-[11px] hover:bg-red-200">
+              <i class="fa-solid fa-trash-can mr-1"></i> Resetar Faltas e Dados
+            </button>
+          </div>
         </section>
 
         <!-- ABA 2: TURMAS DO SEMESTRE -->
@@ -187,7 +196,7 @@
           
           <div id="chat-messages" class="flex-1 bg-white border sigaa-border rounded p-2.5 overflow-y-auto text-xs space-y-2 max-h-[280px]">
             <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded max-w-[90%] shadow-sm">
-              <p class="font-bold text-[11px] mb-1"><i class="fa-solid fa-robot text-blue-700"></i> Mestre JM:</p>
+              <p class="font-bold text-[10px] text-blue-800 mb-0.5"><i class="fa-solid fa-robot text-blue-700"></i> Mestre JM:</p>
               Olá! Sou o <b>Mestre JM</b>, seu assistente virtual. Pode me perguntar sobre <b>faltas</b>, <b>horários</b>, <b>atividades</b> ou <b>notas</b>!
             </div>
           </div>
@@ -314,9 +323,9 @@
 
   </div>
 
-  <!-- Lógica JavaScript -->
+  <!-- Lógica JavaScript com Persistência LocalStorage -->
   <script>
-    let disciplinas = [
+    const defaultDisciplinas = [
       { id: 1, nome: "BANCO DE DADOS", local: "CTBJ/UFPI038", professor: "Elineide", horario: "2345T4", faltas: 2, limite: 15, atividade: "Trabalho de Modelagem MER/DER" },
       { id: 2, nome: "DESENVOLVIMENTO WEB", local: "CTBJ/UFPI101", professor: "Clécio", horario: "2345T1", faltas: 0, limite: 15, atividade: "Entrega do Layout Responsivo Tailwind" },
       { id: 3, nome: "EMPREENDEDORISMO", local: "CTBJ/UFPI044", professor: "Filipe", horario: "56M4", faltas: 1, limite: 15, atividade: "Apresentação do Pitch do Projeto" },
@@ -326,6 +335,22 @@
       { id: 7, nome: "PROJETO INTEGRADOR III", local: "CTBJ/UFPI105", professor: "Outro Professor", horario: "345T2", faltas: 1, limite: 15, atividade: "Escopo e Requisitos Iniciais" },
       { id: 8, nome: "SEGURANÇA DA INFORMAÇÃO", local: "CTBJ/UFPI090", professor: "Elineide", horario: "6T74 23N1", faltas: 5, limite: 15, atividade: "Estudo de Caso sobre Criptografia" }
     ];
+
+    // Carrega dados salvos ou inicializa
+    let disciplinas = JSON.parse(localStorage.getItem('sigaa_disciplinas')) || defaultDisciplinas;
+    let currentUser = JSON.parse(localStorage.getItem('sigaa_user')) || null;
+
+    // Inicialização ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+      if (currentUser) {
+        applyUserData(currentUser);
+        showAppScreen();
+      }
+    });
+
+    function saveState() {
+      localStorage.setItem('sigaa_disciplinas', JSON.stringify(disciplinas));
+    }
 
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
@@ -363,24 +388,36 @@
       }, 3500);
     }
 
-    function handleLogin(e) {
-      e.preventDefault();
-      const nome = document.getElementById('input-nome').value;
-      const matricula = document.getElementById('input-matricula').value;
-      const curso = document.getElementById('input-curso').value;
+    function applyUserData(user) {
+      document.getElementById('user-display-name').innerText = user.nome;
+      document.getElementById('profile-name').innerText = user.nome;
+      document.getElementById('profile-matricula').innerText = user.matricula;
+      document.getElementById('profile-curso').innerText = user.curso;
+    }
 
-      document.getElementById('user-display-name').innerText = nome;
-      document.getElementById('profile-name').innerText = nome;
-      document.getElementById('profile-matricula').innerText = matricula;
-      document.getElementById('profile-curso').innerText = curso;
-
+    function showAppScreen() {
       document.getElementById('screen-login').classList.add('hidden');
       document.getElementById('screen-app').classList.remove('hidden');
       document.getElementById('screen-app').classList.add('flex');
 
       renderTurmas();
       renderFaltas();
-      showToast(`Bem-vindo, ${nome.split(' ')[0]}!`, 'success');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      currentUser = {
+        nome: document.getElementById('input-nome').value,
+        matricula: document.getElementById('input-matricula').value,
+        curso: document.getElementById('input-curso').value
+      };
+
+      localStorage.setItem('sigaa_user', JSON.stringify(currentUser));
+      saveState();
+
+      applyUserData(currentUser);
+      showAppScreen();
+      showToast(`Bem-vindo, ${currentUser.nome.split(' ')[0]}!`, 'success');
     }
 
     function logout() {
@@ -388,6 +425,16 @@
       document.getElementById('screen-app').classList.remove('flex');
       document.getElementById('screen-login').classList.remove('hidden');
       showToast('Sessão encerrada.', 'info');
+    }
+
+    function resetarDados() {
+      localStorage.removeItem('sigaa_disciplinas');
+      localStorage.removeItem('sigaa_user');
+      disciplinas = JSON.parse(JSON.stringify(defaultDisciplinas));
+      currentUser = null;
+      
+      logout();
+      showToast('Dados e faltas redefinidos com sucesso!', 'info');
     }
 
     function switchTab(tab) {
@@ -454,6 +501,7 @@
       const disc = disciplinas.find(d => d.id === id);
       if (disc) {
         disc.faltas += 1;
+        saveState();
         renderFaltas();
         showToast(`+1 falta adicionada em ${disc.nome}`, 'warning');
       }
@@ -490,7 +538,6 @@
       document.getElementById('btn-subtab-' + sub).className = "flex-1 py-2 text-center text-blue-900 border-b-2 border-blue-800 bg-white font-bold";
     }
 
-    // LÓGICA DE RESPOSTAS INTELIGENTES DO MESTRE JM
     function handleChatSubmit(e) {
       e.preventDefault();
       const input = document.getElementById('chat-input');
@@ -498,7 +545,6 @@
       const query = input.value.trim();
       if (!query) return;
 
-      // Mensagem do Aluno
       box.innerHTML += `
         <div class="bg-blue-600 text-white p-2 rounded-lg max-w-[85%] ml-auto text-right text-xs shadow-sm mb-1">
           ${query}
@@ -507,7 +553,6 @@
       input.value = '';
       box.scrollTop = box.scrollHeight;
 
-      // Resposta do Mestre JM
       setTimeout(() => {
         let response = generateJMResponse(query.toLowerCase());
         box.innerHTML += `
@@ -523,19 +568,19 @@
     function generateJMResponse(q) {
       if (q.includes('falta') || q.includes('frequencia') || q.includes('ausencia')) {
         const maisFaltas = [...disciplinas].sort((a,b) => b.faltas - a.faltas)[0];
-        return `Sua disciplina com mais faltas atualmente é <b>${maisFaltas.nome}</b> (${maisFaltas.faltas}/15 faltas). Fique atento para não ultrapassar o limite de 25%!`;
+        return `Sua disciplina com mais faltas no momento é <b>${maisFaltas.nome}</b> (${maisFaltas.faltas}/15 faltas). Mantenha a atenção para não extrapolar o limite!`;
       } 
       else if (q.includes('horario') || q.includes('aula') || q.includes('grade') || q.includes('quando')) {
-        return `As aulas ocorrem no turno da **Tarde** no CTBJ (14h às 17h40). Confira a aba **Grade** no menu inferior para ver o quadro completo por dia da semana!`;
+        return `As aulas do CTBJ acontecem à **Tarde** (14h às 17h40). Verifique a aba **Grade** no menu para a distribuição diária completa.`;
       } 
       else if (q.includes('nota') || q.includes('media') || q.includes('prova') || q.includes('atividade')) {
-        return `Você pode visualizar os detalhes das avaliações e relatórios clicando na disciplina correspondente dentro da aba **Turmas**!`;
+        return `Para checar trabalhos e notas parciais, acesse a aba **Turmas** e clique na disciplina desejada.`;
       } 
       else if (q.includes('quem') || q.includes('jm') || q.includes('mestre')) {
-        return `Sou o **Mestre JM**, o assistente oficial do SIGAA de Bolso. Meu trabalho é ajudar discentes do CTBJ a gerenciar sua rotina acadêmica sem complicações!`;
+        return `Eu sou o **Mestre JM**, o assistente virtual do SIGAA de Bolso criado para facilitar a gestão das suas matérias e presença no CTBJ!`;
       } 
       else {
-        return `Compreendido! Como Mestre JM, posso te orientar sobre suas **faltas**, **turmas**, **horários** ou **atividades**. Qual dessas opções você quer consultar agora?`;
+        return `Certo! Como Mestre JM, posso te ajudar a consultar **faltas**, **turmas**, **horários** e **atividades**. O que gostaria de conferir agora?`;
       }
     }
   </script>
