@@ -42,7 +42,7 @@
 
           <div>
             <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Matrícula:</label>
-            <input type="text" id="input-matricula" required value="20243002109" class="w-full border p-2 text-xs rounded outline-none focus:border-blue-700">
+            <input type="text" id="input-matricula" required value="202410112" class="w-full border p-2 text-xs rounded outline-none focus:border-blue-700">
           </div>
 
           <div>
@@ -538,79 +538,51 @@
       document.getElementById('btn-subtab-' + sub).className = "flex-1 py-2 text-center text-blue-900 border-b-2 border-blue-800 bg-white font-bold";
     }
 
-const GROQ_API_KEY = "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"; // Cole sua chave Groq aqui
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const box = document.getElementById('chat-messages');
+      const query = input.value.trim();
+      if (!query) return;
 
-async function handleChatSubmit(e) {
-  e.preventDefault();
-  const input = document.getElementById('chat-input');
-  const box = document.getElementById('chat-messages');
-  const query = input.value.trim();
-  if (!query) return;
+      box.innerHTML += `
+        <div class="bg-blue-600 text-white p-2 rounded-lg max-w-[85%] ml-auto text-right text-xs shadow-sm mb-1">
+          ${query}
+        </div>
+      `;
+      input.value = '';
+      box.scrollTop = box.scrollHeight;
 
-  // Renderiza mensagem do discente
-  box.innerHTML += `
-    <div class="bg-blue-600 text-white p-2 rounded-lg max-w-[85%] ml-auto text-right text-xs shadow-sm mb-1">
-      ${query}
-    </div>
-  `;
-  input.value = '';
-  box.scrollTop = box.scrollHeight;
-
-  // Balão de carregamento
-  const loadingId = 'loading-' + Date.now();
-  box.innerHTML += `
-    <div id="${loadingId}" class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-lg max-w-[85%] text-xs shadow-sm mb-1 animate-pulse">
-      <p class="font-bold text-[10px] text-blue-800"><i class="fa-solid fa-robot"></i> Mestre JM:</p>
-      Pensando...
-    </div>
-  `;
-  box.scrollTop = box.scrollHeight;
-
-  // Chamada à API da Groq
-  const responseText = await generateJMResponse(query);
-  document.getElementById(loadingId).remove();
-
-  box.innerHTML += `
-    <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-lg max-w-[85%] text-xs shadow-sm mb-1">
-      <p class="font-bold text-[10px] text-blue-800 mb-0.5"><i class="fa-solid fa-robot"></i> Mestre JM:</p>
-      ${responseText}
-    </div>
-  `;
-  box.scrollTop = box.scrollHeight;
-}
-
-async function generateJMResponse(q) {
-  const contextoAluno = JSON.stringify(disciplinas);
-  const systemPrompt = `Você é o Mestre JM, assistente virtual do aplicativo SIGAA de Bolso no Colégio Técnico de Bom Jesus (CTBJ). 
-  Responda de forma clara, prestativa e objetiva. 
-  Consulte os dados das disciplinas do discente quando necessário: ${contextoAluno}.`;
-
-  try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: q }
-        ],
-        temperature: 0.7
-      })
-    });
-
-    const data = await response.json();
-    if (data.choices && data.choices[0].message) {
-      return data.choices[0].message.content.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+      setTimeout(() => {
+        let response = generateJMResponse(query.toLowerCase());
+        box.innerHTML += `
+          <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-lg max-w-[85%] text-xs shadow-sm mb-1">
+            <p class="font-bold text-[10px] text-blue-800 mb-0.5"><i class="fa-solid fa-robot"></i> Mestre JM:</p>
+            ${response}
+          </div>
+        `;
+        box.scrollTop = box.scrollHeight;
+      }, 400);
     }
-    return "Não consegui processar a resposta no momento.";
-  } catch (err) {
-    return "Erro ao conectar com o serviço da Groq. Verifique sua chave API ou conexão com a internet.";
-  }
-}
+
+    function generateJMResponse(q) {
+      if (q.includes('falta') || q.includes('frequencia') || q.includes('ausencia')) {
+        const maisFaltas = [...disciplinas].sort((a,b) => b.faltas - a.faltas)[0];
+        return `Sua disciplina com mais faltas no momento é <b>${maisFaltas.nome}</b> (${maisFaltas.faltas}/15 faltas). Mantenha a atenção para não extrapolar o limite!`;
+      } 
+      else if (q.includes('horario') || q.includes('aula') || q.includes('grade') || q.includes('quando')) {
+        return `As aulas do CTBJ acontecem à **Tarde** (14h às 17h40). Verifique a aba **Grade** no menu para a distribuição diária completa.`;
+      } 
+      else if (q.includes('nota') || q.includes('media') || q.includes('prova') || q.includes('atividade')) {
+        return `Para checar trabalhos e notas parciais, acesse a aba **Turmas** e clique na disciplina desejada.`;
+      } 
+      else if (q.includes('quem') || q.includes('jm') || q.includes('mestre')) {
+        return `Eu sou o **Mestre JM**, o assistente virtual do SIGAA de Bolso criado para facilitar a gestão das suas matérias e presença no CTBJ!`;
+      } 
+      else {
+        return `Certo! Como Mestre JM, posso te ajudar a consultar **faltas**, **turmas**, **horários** e **atividades**. O que gostaria de conferir agora?`;
+      }
+    }
   </script>
 </body>
 </html>
