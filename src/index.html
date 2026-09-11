@@ -32,7 +32,7 @@
 
         <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
           <div class="text-[11px] text-gray-600 bg-blue-50 p-2.5 rounded border border-blue-200">
-            Cadastre os dados do discente para acessar o ambiente móvel do MVP.
+            Digite a matrícula do aluno para carregar ou criar um novo cadastro individual.
           </div>
 
           <div>
@@ -41,7 +41,7 @@
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Matrícula:</label>
+            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Matrícula (Identificador Único):</label>
             <input type="text" id="input-matricula" required value="202410112" class="w-full border p-2 text-xs rounded outline-none focus:border-blue-700">
           </div>
 
@@ -95,10 +95,10 @@
 
           <!-- Gerenciamento de Armazenamento Local -->
           <div class="bg-white border sigaa-border rounded p-3 text-xs space-y-2 shadow-sm">
-            <h3 class="font-bold text-gray-700 border-b pb-1 text-[11px] uppercase">Armazenamento Local</h3>
-            <p class="text-[10px] text-gray-500">Seus dados e faltas estão salvos neste dispositivo.</p>
+            <h3 class="font-bold text-gray-700 border-b pb-1 text-[11px] uppercase">Armazenamento do Aluno</h3>
+            <p class="text-[10px] text-gray-500">Apaga os registros salvos apenas para esta matrícula atual.</p>
             <button onclick="resetarDados()" class="w-full bg-red-100 text-red-700 border border-red-300 font-bold py-1.5 rounded text-[11px] hover:bg-red-200">
-              <i class="fa-solid fa-trash-can mr-1"></i> Resetar Faltas e Dados
+              <i class="fa-solid fa-trash-can mr-1"></i> Resetar Faltas deste Aluno
             </button>
           </div>
         </section>
@@ -323,8 +323,11 @@
 
   </div>
 
-  <!-- Lógica JavaScript com Persistência LocalStorage -->
+  <!-- Lógica JavaScript com Multi-Cadastro por Matrícula & Groq API -->
   <script>
+    // 🔑 CHAVE GROQ API (Adicione sua chave aqui se quiser respostas via LLM)
+    const GROQ_API_KEY = "gsk_SUA_CHAVE_GROQ_AQUI";
+
     const defaultDisciplinas = [
       { id: 1, nome: "BANCO DE DADOS", local: "CTBJ/UFPI038", professor: "Elineide", horario: "2345T4", faltas: 2, limite: 15, atividade: "Trabalho de Modelagem MER/DER" },
       { id: 2, nome: "DESENVOLVIMENTO WEB", local: "CTBJ/UFPI101", professor: "Clécio", horario: "2345T1", faltas: 0, limite: 15, atividade: "Entrega do Layout Responsivo Tailwind" },
@@ -336,11 +339,14 @@
       { id: 8, nome: "SEGURANÇA DA INFORMAÇÃO", local: "CTBJ/UFPI090", professor: "Elineide", horario: "6T74 23N1", faltas: 5, limite: 15, atividade: "Estudo de Caso sobre Criptografia" }
     ];
 
-    // Carrega dados salvos ou inicializa
-    let disciplinas = JSON.parse(localStorage.getItem('sigaa_disciplinas')) || defaultDisciplinas;
-    let currentUser = JSON.parse(localStorage.getItem('sigaa_user')) || null;
+    // Carregamento inteligente por Matrícula
+    let activeMatricula = localStorage.getItem('sigaa_active_matricula');
+    let currentUser = activeMatricula ? JSON.parse(localStorage.getItem(`sigaa_user_${activeMatricula}`)) : null;
+    let disciplinas = (activeMatricula && localStorage.getItem(`sigaa_disciplinas_${activeMatricula}`))
+      ? JSON.parse(localStorage.getItem(`sigaa_disciplinas_${activeMatricula}`))
+      : JSON.parse(JSON.stringify(defaultDisciplinas));
 
-    // Inicialização ao carregar a página
+    // Inicialização da interface
     window.addEventListener('DOMContentLoaded', () => {
       if (currentUser) {
         applyUserData(currentUser);
@@ -349,7 +355,51 @@
     });
 
     function saveState() {
-      localStorage.setItem('sigaa_disciplinas', JSON.stringify(disciplinas));
+      if (!currentUser) return;
+      localStorage.setItem(`sigaa_disciplinas_${currentUser.matricula}`, JSON.stringify(disciplinas));
+      localStorage.setItem(`sigaa_user_${currentUser.matricula}`, JSON.stringify(currentUser));
+      localStorage.setItem('sigaa_active_matricula', currentUser.matricula);
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const mat = document.getElementById('input-matricula').value.trim();
+
+      currentUser = {
+        nome: document.getElementById('input-nome').value.trim(),
+        matricula: mat,
+        curso: document.getElementById('input-curso').value.trim()
+      };
+
+      // Se esse aluno já tiver histórico, carrega as faltas dele. Se não, inicia do zero.
+      const savedDisciplinas = localStorage.getItem(`sigaa_disciplinas_${mat}`);
+      disciplinas = savedDisciplinas ? JSON.parse(savedDisciplinas) : JSON.parse(JSON.stringify(defaultDisciplinas));
+
+      saveState();
+      applyUserData(currentUser);
+      showAppScreen();
+      showToast(`Bem-vindo, ${currentUser.nome.split(' ')[0]}!`, 'success');
+    }
+
+    function logout() {
+      localStorage.removeItem('sigaa_active_matricula');
+      currentUser = null;
+      document.getElementById('screen-app').classList.add('hidden');
+      document.getElementById('screen-app').classList.remove('flex');
+      document.getElementById('screen-login').classList.remove('hidden');
+      showToast('Sessão encerrada.', 'info');
+    }
+
+    function resetarDados() {
+      if (currentUser) {
+        localStorage.removeItem(`sigaa_disciplinas_${currentUser.matricula}`);
+        localStorage.removeItem(`sigaa_user_${currentUser.matricula}`);
+        localStorage.removeItem('sigaa_active_matricula');
+      }
+      disciplinas = JSON.parse(JSON.stringify(defaultDisciplinas));
+      currentUser = null;
+      logout();
+      showToast('Dados e faltas deste cadastro foram apagados!', 'info');
     }
 
     function showToast(message, type = 'info') {
@@ -402,39 +452,6 @@
 
       renderTurmas();
       renderFaltas();
-    }
-
-    function handleLogin(e) {
-      e.preventDefault();
-      currentUser = {
-        nome: document.getElementById('input-nome').value,
-        matricula: document.getElementById('input-matricula').value,
-        curso: document.getElementById('input-curso').value
-      };
-
-      localStorage.setItem('sigaa_user', JSON.stringify(currentUser));
-      saveState();
-
-      applyUserData(currentUser);
-      showAppScreen();
-      showToast(`Bem-vindo, ${currentUser.nome.split(' ')[0]}!`, 'success');
-    }
-
-    function logout() {
-      document.getElementById('screen-app').classList.add('hidden');
-      document.getElementById('screen-app').classList.remove('flex');
-      document.getElementById('screen-login').classList.remove('hidden');
-      showToast('Sessão encerrada.', 'info');
-    }
-
-    function resetarDados() {
-      localStorage.removeItem('sigaa_disciplinas');
-      localStorage.removeItem('sigaa_user');
-      disciplinas = JSON.parse(JSON.stringify(defaultDisciplinas));
-      currentUser = null;
-      
-      logout();
-      showToast('Dados e faltas redefinidos com sucesso!', 'info');
     }
 
     function switchTab(tab) {
@@ -503,7 +520,7 @@
         disc.faltas += 1;
         saveState();
         renderFaltas();
-        showToast(`+1 falta adicionada em ${disc.nome}`, 'warning');
+        showToast(`+1 falta registrada em ${disc.nome}`, 'warning');
       }
     }
 
@@ -538,7 +555,8 @@
       document.getElementById('btn-subtab-' + sub).className = "flex-1 py-2 text-center text-blue-900 border-b-2 border-blue-800 bg-white font-bold";
     }
 
-    function handleChatSubmit(e) {
+    // ================= CHATBOT MESTRE JM =================
+    async function handleChatSubmit(e) {
       e.preventDefault();
       const input = document.getElementById('chat-input');
       const box = document.getElementById('chat-messages');
@@ -553,34 +571,102 @@
       input.value = '';
       box.scrollTop = box.scrollHeight;
 
-      setTimeout(() => {
-        let response = generateJMResponse(query.toLowerCase());
-        box.innerHTML += `
-          <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-lg max-w-[85%] text-xs shadow-sm mb-1">
-            <p class="font-bold text-[10px] text-blue-800 mb-0.5"><i class="fa-solid fa-robot"></i> Mestre JM:</p>
-            ${response}
-          </div>
-        `;
-        box.scrollTop = box.scrollHeight;
-      }, 400);
+      const loadingId = 'loading-' + Date.now();
+      box.innerHTML += `
+        <div id="${loadingId}" class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-lg max-w-[85%] text-xs shadow-sm mb-1 animate-pulse">
+          <p class="font-bold text-[10px] text-blue-800"><i class="fa-solid fa-robot"></i> Mestre JM:</p>
+          Pensando...
+        </div>
+      `;
+      box.scrollTop = box.scrollHeight;
+
+      const responseText = await generateJMResponse(query);
+
+      const loadingElem = document.getElementById(loadingId);
+      if (loadingElem) loadingElem.remove();
+
+      box.innerHTML += `
+        <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-lg max-w-[85%] text-xs shadow-sm mb-1">
+          <p class="font-bold text-[10px] text-blue-800 mb-0.5"><i class="fa-solid fa-robot"></i> Mestre JM:</p>
+          ${responseText}
+        </div>
+      `;
+      box.scrollTop = box.scrollHeight;
     }
 
-    function generateJMResponse(q) {
-      if (q.includes('falta') || q.includes('frequencia') || q.includes('ausencia')) {
+    async function generateJMResponse(q) {
+      if (!GROQ_API_KEY || GROQ_API_KEY.includes("SUA_CHAVE_GROQ_AQUI")) {
+        return generateLocalFallbackResponse(q);
+      }
+
+      const contextoAluno = JSON.stringify({
+        aluno: currentUser ? currentUser.nome : 'Discente',
+        disciplinas: disciplinas
+      });
+
+      const systemPrompt = `Você é o Mestre JM, assistente virtual humanizado do aplicativo SIGAA de Bolso do Colégio Técnico de Bom Jesus (CTBJ/UFPI).
+      Responda de forma curta, clara e útil ao aluno em português.
+      Contexto de dados reais do discente: ${contextoAluno}.`;
+
+      const modelos = [
+        'llama-3.3-70b-versatile',
+        'llama-3.1-8b-instant',
+        'llama3-8b-8192',
+        'gemma2-9b-it'
+      ];
+
+      for (const model of modelos) {
+        try {
+          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${GROQ_API_KEY.trim()}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: q }
+              ],
+              temperature: 0.6,
+              max_tokens: 350
+            })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data.choices && data.choices[0]?.message?.content) {
+              return data.choices[0].message.content
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                .replace(/\n/g, '<br>');
+            }
+          }
+        } catch (err) {
+          console.warn(`Erro com modelo ${model}:`, err);
+        }
+      }
+
+      return generateLocalFallbackResponse(q);
+    }
+
+    function generateLocalFallbackResponse(q) {
+      const query = q.toLowerCase();
+      if (query.includes('falta') || query.includes('frequencia') || query.includes('ausencia')) {
         const maisFaltas = [...disciplinas].sort((a,b) => b.faltas - a.faltas)[0];
-        return `Sua disciplina com mais faltas no momento é <b>${maisFaltas.nome}</b> (${maisFaltas.faltas}/15 faltas). Mantenha a atenção para não extrapolar o limite!`;
+        return `Sua disciplina com mais faltas no momento é <b>${maisFaltas.nome}</b> (${maisFaltas.faltas}/${maisFaltas.limite} faltas). Mantenha a atenção para não ultrapassar o limite!`;
       } 
-      else if (q.includes('horario') || q.includes('aula') || q.includes('grade') || q.includes('quando')) {
-        return `As aulas do CTBJ acontecem à **Tarde** (14h às 17h40). Verifique a aba **Grade** no menu para a distribuição diária completa.`;
+      else if (query.includes('horario') || query.includes('aula') || query.includes('grade') || query.includes('quando')) {
+        return `As aulas do CTBJ acontecem no período da <b>Tarde</b> (14h às 17h40). Consulte a aba <b>Grade</b> para ver a tabela semanal.`;
       } 
-      else if (q.includes('nota') || q.includes('media') || q.includes('prova') || q.includes('atividade')) {
-        return `Para checar trabalhos e notas parciais, acesse a aba **Turmas** e clique na disciplina desejada.`;
+      else if (query.includes('nota') || query.includes('media') || query.includes('prova') || query.includes('atividade')) {
+        return `Para checar trabalhos e notas parciais, acesse a aba <b>Turmas</b> e clique sobre a matéria desejada.`;
       } 
-      else if (q.includes('quem') || q.includes('jm') || q.includes('mestre')) {
-        return `Eu sou o **Mestre JM**, o assistente virtual do SIGAA de Bolso criado para facilitar a gestão das suas matérias e presença no CTBJ!`;
+      else if (query.includes('quem') || query.includes('jm') || query.includes('mestre')) {
+        return `Eu sou o <b>Mestre JM</b>, o assistente virtual do SIGAA de Bolso criado para ajudar você no CTBJ!`;
       } 
       else {
-        return `Certo! Como Mestre JM, posso te ajudar a consultar **faltas**, **turmas**, **horários** e **atividades**. O que gostaria de conferir agora?`;
+        return `Certo! Como Mestre JM, posso te ajudar a consultar <b>faltas</b>, <b>turmas</b>, <b>horários</b> e <b>atividades</b>. O que você gostaria de saber?`;
       }
     }
   </script>
