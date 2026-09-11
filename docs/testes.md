@@ -2,6 +2,7 @@
 **Projeto:** SIGAA de Bolso Mobile  
 **Instituição:** Colégio Técnico de Bom Jesus (CTBJ / UFPI)  
 **Disciplina:** Projeto Integrador II  
+**Aluno:** Gabriel Ferreira Piauilino
 
 ---
 
