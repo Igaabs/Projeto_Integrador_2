@@ -42,3 +42,18 @@ Os testes foram executados simulando cenários de uso real no ambiente móvel:
 * **Casos de Teste Aprovados:** 7 (100%)
 * **Ambiente de Testes:** Chrome DevTools (Mobile View Emulator / iPhone 12 Pro) e Android Chrome Browser.
 * **Estado do Código:** Estável e pronto para hospedagem pública no GitHub Pages.
+
+## 4. Registros
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165555" src="https://github.com/user-attachments/assets/6b6fad17-5bf0-4608-8758-167098145e2a" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165731" src="https://github.com/user-attachments/assets/9fe3cd8c-0900-4f67-bd19-e03595b14a2f" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165719" src="https://github.com/user-attachments/assets/2699b7b6-c385-4656-8d59-de2f7ef28859" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165635" src="https://github.com/user-attachments/assets/d1ef9108-d353-4fb6-a963-dd1ce69d763e" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165624" src="https://github.com/user-attachments/assets/7c81119e-19f9-4c9b-b48e-79769cd29cf3" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165616" src="https://github.com/user-attachments/assets/ca3b6464-7010-480d-8a03-96760448e873" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165608" src="https://github.com/user-attachments/assets/41d90391-b6e4-40bb-a8b3-e758104f1beb" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165452" src="https://github.com/user-attachments/assets/cc8cff8d-6fd8-4fe5-b5ca-e33fcbf7903e" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165512" src="https://github.com/user-attachments/assets/662b2dd1-71fe-4d1c-ab5d-bd52a617ca35" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165503" src="https://github.com/user-attachments/assets/43e75aea-71e2-4fbe-8c75-c725be7ec1cb" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165400" src="https://github.com/user-attachments/assets/e471f837-baae-46c2-84ad-bf7934a061fa" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165215" src="https://github.com/user-attachments/assets/14bc500d-722a-4f8d-88e3-a3803dcc3e7c" />
+<img width="1920" height="1080" alt="Captura de tela 2026-09-11 165252" src="https://github.com/user-attachments/assets/2815aeba-6015-44c9-944f-ddbfcfb06295" />
