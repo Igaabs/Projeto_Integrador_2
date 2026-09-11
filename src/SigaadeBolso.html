@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIGAA de Bolso Mobile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; background-color: #e2e8f0; }
+    .sigaa-bg-dark { background-color: #2b5278; }
+    .sigaa-bg-light { background-color: #e8eef5; }
+    .sigaa-border { border-color: #b0c4de; }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 sm:p-4">
+
+  <!-- FRAME MOBILE DO CELULAR -->
+  <div class="w-full max-w-sm bg-white min-h-screen sm:min-h-[720px] sm:max-h-[760px] sm:rounded-3xl shadow-2xl border border-gray-300 flex flex-col justify-between overflow-hidden relative">
+
+    <!-- CONTAINER DE NOTIFICAÇÕES FLUTUANTES (TOASTS) -->
+    <div id="toast-container" class="absolute top-14 left-3 right-3 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- ================= TELA DE LOGIN / CADASTRO ================= -->
+    <div id="screen-login" class="flex-1 flex flex-col justify-between p-5 bg-white">
+      <div>
+        <div class="sigaa-bg-dark text-white p-4 -mx-5 -mt-5 mb-6 text-center shadow-md">
+          <i class="fa-solid fa-graduation-cap text-3xl mb-1"></i>
+          <h1 class="font-bold text-lg">SIGAA de Bolso</h1>
+          <p class="text-xs text-blue-200">Portal Discente Mobile</p>
+        </div>
+
+        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+          <div class="text-[11px] text-gray-600 bg-blue-50 p-2.5 rounded border border-blue-200">
+            Digite a matrícula do aluno para carregar ou criar um novo cadastro individual.
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Nome Completo:</label>
+            <input type="text" id="input-nome" required value="GABRIEL FERREIRA PIAUILINO" class="w-full border p-2 text-xs rounded outline-none focus:border-blue-700">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Matrícula (Identificador Único):</label>
+            <input type="text" id="input-matricula" required value="202410112" class="w-full border p-2 text-xs rounded outline-none focus:border-blue-700">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Unidade / Curso:</label>
+            <input type="text" id="input-curso" required value="COLÉGIO TÉCNICO DE BOM JESUS (CTBJ)" class="w-full border p-2 text-xs rounded outline-none focus:border-blue-700">
+          </div>
+
+          <button type="submit" class="w-full sigaa-bg-dark text-white font-bold py-2.5 rounded text-xs shadow hover:opacity-90 transition mt-2">
+            Entrar no Portal Mobile
+          </button>
+        </form>
+      </div>
+
+      <p class="text-[10px] text-center text-gray-400 mt-4">SIGAA de Bolso • Projeto Integrador II</p>
+    </div>
+
+    <!-- ================= TELA PRINCIPAL (APP MOBILE) ================= -->
+    <div id="screen-app" class="flex-1 hidden flex-col h-full bg-slate-50 overflow-hidden relative">
+      
+      <!-- Topo Fixo do App -->
+      <header class="sigaa-bg-dark text-white p-3 shadow flex justify-between items-center text-xs z-10">
+        <div>
+          <h2 id="user-display-name" class="font-bold text-xs truncate max-w-[180px]">DISCENTE</h2>
+          <p class="text-[10px] text-blue-200">Semestre Atual: <b>2026.2</b></p>
+        </div>
+        <button onclick="logout()" class="text-[11px] bg-blue-900 px-2 py-1 rounded text-blue-100 hover:bg-blue-800">
+          <i class="fa-solid fa-right-from-bracket"></i> Sair
+        </button>
+      </header>
+
+      <!-- Conteúdo das Abas (Scrollável) -->
+      <main class="flex-1 overflow-y-auto p-3 space-y-3">
+
+        <!-- ABA 1: DISCENTE (PERFIL) -->
+        <section id="tab-perfil" class="space-y-3">
+          <div class="bg-white border sigaa-border rounded p-3 text-center space-y-2 shadow-sm">
+            <div class="w-16 h-20 bg-gray-200 border mx-auto flex items-center justify-center text-gray-500 rounded">
+              <i class="fa-solid fa-user text-2xl"></i>
+            </div>
+            <p id="profile-name" class="font-bold text-xs text-blue-900 uppercase">NOME DO ALUNO</p>
+          </div>
+
+          <div class="bg-white border sigaa-border rounded p-3 text-xs space-y-1.5 shadow-sm">
+            <h3 class="font-bold text-blue-900 border-b pb-1 text-[11px] uppercase">Dados Institucionais</h3>
+            <p><b>Matrícula:</b> <span id="profile-matricula">000000</span></p>
+            <p><b>Unidade:</b> <span id="profile-curso">CTBJ</span></p>
+            <p><b>Status:</b> <span class="text-green-700 font-bold">ATIVO</span></p>
+            <p><b>Entrada:</b> 2024.1</p>
+          </div>
+
+          <!-- Gerenciamento de Armazenamento Local -->
+          <div class="bg-white border sigaa-border rounded p-3 text-xs space-y-2 shadow-sm">
+            <h3 class="font-bold text-gray-700 border-b pb-1 text-[11px] uppercase">Armazenamento do Aluno</h3>
+            <p class="text-[10px] text-gray-500">Apaga os registros salvos apenas para esta matrícula atual.</p>
+            <button onclick="resetarDados()" class="w-full bg-red-100 text-red-700 border border-red-300 font-bold py-1.5 rounded text-[11px] hover:bg-red-200">
+              <i class="fa-solid fa-trash-can mr-1"></i> Resetar Faltas deste Aluno
+            </button>
+          </div>
+        </section>
+
+        <!-- ABA 2: TURMAS DO SEMESTRE -->
+        <section id="tab-turmas" class="space-y-2 hidden">
+          <div class="flex justify-between items-center border-b pb-1">
+            <h3 class="font-bold text-xs text-gray-700 uppercase">Turmas do Semestre</h3>
+            <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">Toque para abrir</span>
+          </div>
+
+          <div id="turmas-list" class="space-y-2">
+            <!-- Renderizado dinamicamente via JS -->
+          </div>
+        </section>
+
+        <!-- ABA 3: GRADE DE HORÁRIOS -->
+        <section id="tab-grade" class="space-y-2 hidden">
+          <div class="flex justify-between items-center border-b pb-1">
+            <h3 class="font-bold text-xs text-gray-700 uppercase">Grade de Horários</h3>
+            <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">Módulo V (Tarde)</span>
+          </div>
+
+          <div class="overflow-x-auto border sigaa-border rounded bg-white shadow-sm">
+            <table class="w-full text-[10px] text-center border-collapse">
+              <thead>
+                <tr class="sigaa-bg-dark text-white font-bold">
+                  <th class="p-1 border border-blue-900 min-w-[55px]">Horário</th>
+                  <th class="p-1 border border-blue-900">Seg</th>
+                  <th class="p-1 border border-blue-900">Ter</th>
+                  <th class="p-1 border border-blue-900">Qua</th>
+                  <th class="p-1 border border-blue-900">Qui</th>
+                  <th class="p-1 border border-blue-900">Sex</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-gray-800">
+                <tr>
+                  <td class="p-1 font-bold bg-gray-100 border">14h-14h50</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Seg. Inform.</td>
+                  <td class="p-1 bg-blue-100 text-[9px] font-semibold border">PI II</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Banco Dados</td>
+                  <td class="p-1 bg-amber-100 text-[9px] font-semibold border">Empreend.</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Lab. Prog.</td>
+                </tr>
+                <tr>
+                  <td class="p-1 font-bold bg-gray-100 border">14h50-15h40</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Seg. Inform.</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Seg. Inform.</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Banco Dados</td>
+                  <td class="p-1 bg-amber-100 text-[9px] font-semibold border">Empreend.</td>
+                  <td class="p-1 bg-gray-50 border text-gray-400">-</td>
+                </tr>
+                <tr class="bg-gray-200 text-gray-600 font-bold">
+                  <td class="p-1 border text-[9px]" colspan="6">INTERVALO (15h40 - 16h)</td>
+                </tr>
+                <tr>
+                  <td class="p-1 font-bold bg-gray-100 border">16h-16h50</td>
+                  <td class="p-1 bg-yellow-100 text-[9px] font-semibold border">Dev. Web</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Lab. Prog.</td>
+                  <td class="p-1 bg-blue-100 text-[9px] font-semibold border">PI II</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Lab. BD</td>
+                  <td class="p-1 bg-blue-50 text-[9px] font-semibold border">PI III</td>
+                </tr>
+                <tr>
+                  <td class="p-1 font-bold bg-gray-100 border">16h50-17h40</td>
+                  <td class="p-1 bg-yellow-100 text-[9px] font-semibold border">Dev. Web</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Lab. Prog.</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Banco Dados</td>
+                  <td class="p-1 bg-purple-100 text-[9px] font-semibold border">Lab. BD</td>
+                  <td class="p-1 bg-blue-50 text-[9px] font-semibold border">PI III</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ABA 4: TERMÔMETRO DE FALTAS -->
+        <section id="tab-faltas" class="space-y-2 hidden">
+          <div class="flex justify-between items-center border-b pb-1">
+            <h3 class="font-bold text-xs text-gray-700 uppercase">Termômetro de Faltas</h3>
+            <span class="text-[10px] text-gray-500">Limite: 15 Faltas</span>
+          </div>
+
+          <div id="faltas-list" class="space-y-2.5">
+            <!-- Renderizado dinamicamente via JS -->
+          </div>
+        </section>
+
+        <!-- ABA 5: CHATBOT IA - MESTRE JM -->
+        <section id="tab-chat" class="space-y-2 hidden flex flex-col h-full min-h-[350px]">
+          <div class="flex items-center gap-2 border-b pb-1">
+            <i class="fa-solid fa-user-ninja text-blue-900 text-sm"></i>
+            <h3 class="font-bold text-xs text-gray-700 uppercase">Mestre JM - Assistente Acadêmico</h3>
+          </div>
+          
+          <div id="chat-messages" class="flex-1 bg-white border sigaa-border rounded p-2.5 overflow-y-auto text-xs space-y-2 max-h-[280px]">
+            <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded max-w-[90%] shadow-sm">
+              <p class="font-bold text-[10px] text-blue-800 mb-0.5"><i class="fa-solid fa-robot text-blue-700"></i> Mestre JM:</p>
+              Olá! Sou o <b>Mestre JM</b>, seu assistente virtual. Pode me perguntar sobre <b>faltas</b>, <b>horários</b>, <b>atividades</b> ou <b>notas</b>!
+            </div>
+          </div>
+
+          <form onsubmit="handleChatSubmit(event)" class="flex gap-1.5 pt-1">
+            <input type="text" id="chat-input" placeholder="Pergunte ao Mestre JM..." class="flex-1 border p-2 text-xs rounded outline-none focus:border-blue-700">
+            <button type="submit" class="sigaa-bg-dark text-white px-3 py-2 rounded text-xs font-bold hover:opacity-90">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </form>
+        </section>
+
+      </main>
+
+      <!-- MODAL DETALHES DA DISCIPLINA -->
+      <div id="modal-discipline" class="absolute inset-0 bg-white z-40 hidden flex-col">
+        
+        <!-- Header do Modal -->
+        <div class="sigaa-bg-dark text-white p-3 flex justify-between items-center text-xs">
+          <div>
+            <h3 id="modal-disc-title" class="font-bold text-xs uppercase">NOME DA DISCIPLINA</h3>
+            <p id="modal-disc-sub" class="text-[10px] text-blue-200">Professor • Local</p>
+          </div>
+          <button onclick="closeDisciplineModal()" class="text-white text-base px-2">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Banner Interno de Notificação -->
+        <div id="modal-alert-box" class="bg-amber-100 border-b border-amber-300 p-2.5 flex items-center gap-2 text-amber-900 text-[11px] font-semibold">
+          <i class="fa-solid fa-bell text-amber-600 text-sm animate-bounce"></i>
+          <span id="modal-alert-text">Nova atividade cadastrada nesta disciplina!</span>
+        </div>
+
+        <!-- Navegação Interna do Modal -->
+        <div class="flex border-b border-gray-300 text-xs bg-gray-100 font-bold text-gray-600">
+          <button id="btn-subtab-atividades" onclick="switchSubTab('atividades')" class="flex-1 py-2 text-center text-blue-900 border-b-2 border-blue-800 bg-white">
+            Atividades
+          </button>
+          <button id="btn-subtab-notas" onclick="switchSubTab('notas')" class="flex-1 py-2 text-center hover:bg-gray-200">
+            Notas
+          </button>
+        </div>
+
+        <!-- Conteúdo Interno do Modal -->
+        <div class="flex-1 p-3 overflow-y-auto space-y-3 text-xs bg-slate-50">
+          
+          <!-- SUB-ABA ATIVIDADES -->
+          <div id="subtab-atividades" class="space-y-2">
+            <div class="bg-white border p-2.5 rounded shadow-sm">
+              <div class="flex justify-between items-start mb-1">
+                <span class="font-bold text-blue-900 text-[11px]">Trabalho Prático - MVP</span>
+                <span class="bg-red-100 text-red-700 text-[9px] px-1.5 py-0.5 rounded font-bold">Pendente</span>
+              </div>
+              <p class="text-gray-600 text-[10px]">Entrega do relatório técnico e código fonte no GitHub.</p>
+              <p class="text-gray-400 text-[10px] mt-1"><b>Prazo:</b> 25/09/2026 às 23:59</p>
+            </div>
+
+            <div class="bg-white border p-2.5 rounded shadow-sm">
+              <div class="flex justify-between items-start mb-1">
+                <span class="font-bold text-blue-900 text-[11px]">Questionário Individual #1</span>
+                <span class="bg-green-100 text-green-700 text-[9px] px-1.5 py-0.5 rounded font-bold">Entregue</span>
+              </div>
+              <p class="text-gray-600 text-[10px]">Atendimento aos requisitos funcionais e arquitetura.</p>
+              <p class="text-gray-400 text-[10px] mt-1"><b>Prazo:</b> 10/09/2026</p>
+            </div>
+          </div>
+
+          <!-- SUB-ABA NOTAS -->
+          <div id="subtab-notas" class="space-y-2 hidden">
+            <div class="bg-white border sigaa-border rounded overflow-hidden shadow-sm">
+              <table class="w-full text-center text-xs">
+                <thead>
+                  <tr class="bg-gray-100 border-b text-gray-700">
+                    <th class="p-2 text-left">Avaliação</th>
+                    <th class="p-2">Peso</th>
+                    <th class="p-2">Nota</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y text-gray-800">
+                  <tr>
+                    <td class="p-2 text-left font-semibold">Avaliação N1</td>
+                    <td class="p-2">4.0</td>
+                    <td class="p-2 font-bold text-green-700">8.5</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 text-left font-semibold">Avaliação N2</td>
+                    <td class="p-2">6.0</td>
+                    <td class="p-2 font-bold text-green-700">9.0</td>
+                  </tr>
+                  <tr class="bg-blue-50 font-bold">
+                    <td class="p-2 text-left text-blue-900">Média Parcial</td>
+                    <td class="p-2">-</td>
+                    <td class="p-2 text-blue-900">8.8</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Menu de Navegação Inferior (Barra Mobile) -->
+      <nav class="bg-white border-t border-gray-300 flex justify-around py-2 text-[10px] text-gray-500 z-10">
+        <button onclick="switchTab('perfil')" id="btn-perfil" class="flex-1 text-center text-blue-800 font-bold">
+          <i class="fa-solid fa-id-card text-base block mb-0.5"></i> Perfil
+        </button>
+        <button onclick="switchTab('turmas')" id="btn-turmas" class="flex-1 text-center hover:text-blue-800">
+          <i class="fa-solid fa-book-bookmark text-base block mb-0.5"></i> Turmas
+        </button>
+        <button onclick="switchTab('grade')" id="btn-grade" class="flex-1 text-center hover:text-blue-800">
+          <i class="fa-solid fa-calendar-days text-base block mb-0.5"></i> Grade
+        </button>
+        <button onclick="switchTab('faltas')" id="btn-faltas" class="flex-1 text-center hover:text-blue-800">
+          <i class="fa-solid fa-clipboard-user text-base block mb-0.5"></i> Faltas
+        </button>
+        <button onclick="switchTab('chat')" id="btn-chat" class="flex-1 text-center hover:text-blue-800">
+          <i class="fa-solid fa-robot text-base block mb-0.5"></i> Mestre JM
+        </button>
+      </nav>
+
+    </div>
+
+  </div>
+
+  <!-- Lógica JavaScript com Multi-Cadastro por Matrícula & Groq API -->
+  <script>
+    // 🔑 CHAVE GROQ API (Adicione sua chave aqui se quiser respostas via LLM)
+    const GROQ_API_KEY = "gsk_SUA_CHAVE_GROQ_AQUI";
+
+    const defaultDisciplinas = [
+      { id: 1, nome: "BANCO DE DADOS", local: "CTBJ/UFPI038", professor: "Elineide", horario: "2345T4", faltas: 2, limite: 15, atividade: "Trabalho de Modelagem MER/DER" },
+      { id: 2, nome: "DESENVOLVIMENTO WEB", local: "CTBJ/UFPI101", professor: "Clécio", horario: "2345T1", faltas: 0, limite: 15, atividade: "Entrega do Layout Responsivo Tailwind" },
+      { id: 3, nome: "EMPREENDEDORISMO", local: "CTBJ/UFPI044", professor: "Filipe", horario: "56M4", faltas: 1, limite: 15, atividade: "Apresentação do Pitch do Projeto" },
+      { id: 4, nome: "LABORATÓRIO DE BANCO DE DADOS", local: "CTBJ/UFPI202", professor: "Elineide", horario: "234N2", faltas: 3, limite: 15, atividade: "Script SQL para Criação de Tabelas" },
+      { id: 5, nome: "LABORATÓRIO DE PROGRAMAÇÃO", local: "CTBJ/UFPI206", professor: "Elineide", horario: "4567N1", faltas: 0, limite: 15, atividade: "Exercício Prático de Lógica em JS" },
+      { id: 6, nome: "PROJETO INTEGRADOR II", local: "CTBJ/UFPI105", professor: "Clécio", horario: "2T2 6T1", faltas: 2, limite: 15, atividade: "Relatório de Testes e Validação (/docs/testes.md)" },
+      { id: 7, nome: "PROJETO INTEGRADOR III", local: "CTBJ/UFPI105", professor: "Outro Professor", horario: "345T2", faltas: 1, limite: 15, atividade: "Escopo e Requisitos Iniciais" },
+      { id: 8, nome: "SEGURANÇA DA INFORMAÇÃO", local: "CTBJ/UFPI090", professor: "Elineide", horario: "6T74 23N1", faltas: 5, limite: 15, atividade: "Estudo de Caso sobre Criptografia" }
+    ];
+
+    // Carregamento inteligente por Matrícula
+    let activeMatricula = localStorage.getItem('sigaa_active_matricula');
+    let currentUser = activeMatricula ? JSON.parse(localStorage.getItem(`sigaa_user_${activeMatricula}`)) : null;
+    let disciplinas = (activeMatricula && localStorage.getItem(`sigaa_disciplinas_${activeMatricula}`))
+      ? JSON.parse(localStorage.getItem(`sigaa_disciplinas_${activeMatricula}`))
+      : JSON.parse(JSON.stringify(defaultDisciplinas));
+
+    // Inicialização da interface
+    window.addEventListener('DOMContentLoaded', () => {
+      if (currentUser) {
+        applyUserData(currentUser);
+        showAppScreen();
+      }
+    });
+
+    function saveState() {
+      if (!currentUser) return;
+      localStorage.setItem(`sigaa_disciplinas_${currentUser.matricula}`, JSON.stringify(disciplinas));
+      localStorage.setItem(`sigaa_user_${currentUser.matricula}`, JSON.stringify(currentUser));
+      localStorage.setItem('sigaa_active_matricula', currentUser.matricula);
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const mat = document.getElementById('input-matricula').value.trim();
+
+      currentUser = {
+        nome: document.getElementById('input-nome').value.trim(),
+        matricula: mat,
+        curso: document.getElementById('input-curso').value.trim()
+      };
+
+      // Se esse aluno já tiver histórico, carrega as faltas dele. Se não, inicia do zero.
+      const savedDisciplinas = localStorage.getItem(`sigaa_disciplinas_${mat}`);
+      disciplinas = savedDisciplinas ? JSON.parse(savedDisciplinas) : JSON.parse(JSON.stringify(defaultDisciplinas));
+
+      saveState();
+      applyUserData(currentUser);
+      showAppScreen();
+      showToast(`Bem-vindo, ${currentUser.nome.split(' ')[0]}!`, 'success');
+    }
+
+    function logout() {
+      localStorage.removeItem('sigaa_active_matricula');
+      currentUser = null;
+      document.getElementById('screen-app').classList.add('hidden');
+      document.getElementById('screen-app').classList.remove('flex');
+      document.getElementById('screen-login').classList.remove('hidden');
+      showToast('Sessão encerrada.', 'info');
+    }
+
+    function resetarDados() {
+      if (currentUser) {
+        localStorage.removeItem(`sigaa_disciplinas_${currentUser.matricula}`);
+        localStorage.removeItem(`sigaa_user_${currentUser.matricula}`);
+        localStorage.removeItem('sigaa_active_matricula');
+      }
+      disciplinas = JSON.parse(JSON.stringify(defaultDisciplinas));
+      currentUser = null;
+      logout();
+      showToast('Dados e faltas deste cadastro foram apagados!', 'info');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      let bgClass = "bg-blue-900 text-white";
+      let icon = "fa-info-circle";
+
+      if (type === 'warning') {
+        bgClass = "bg-amber-600 text-white";
+        icon = "fa-triangle-exclamation";
+      } else if (type === 'success') {
+        bgClass = "bg-emerald-700 text-white";
+        icon = "fa-circle-check";
+      }
+
+      toast.className = `${bgClass} text-[11px] px-3 py-2 rounded-lg shadow-lg flex items-center justify-between gap-2 transition-all duration-300 opacity-0 -translate-y-2 pointer-events-auto`;
+      toast.innerHTML = `
+        <div class="flex items-center gap-2">
+          <i class="fa-solid ${icon}"></i>
+          <span>${message}</span>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-white opacity-70 hover:opacity-100 text-xs font-bold pl-1">&times;</button>
+      `;
+
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('opacity-0', '-translate-y-2');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function applyUserData(user) {
+      document.getElementById('user-display-name').innerText = user.nome;
+      document.getElementById('profile-name').innerText = user.nome;
+      document.getElementById('profile-matricula').innerText = user.matricula;
+      document.getElementById('profile-curso').innerText = user.curso;
+    }
+
+    function showAppScreen() {
+      document.getElementById('screen-login').classList.add('hidden');
+      document.getElementById('screen-app').classList.remove('hidden');
+      document.getElementById('screen-app').classList.add('flex');
+
+      renderTurmas();
+      renderFaltas();
+    }
+
+    function switchTab(tab) {
+      ['perfil', 'turmas', 'grade', 'faltas', 'chat'].forEach(t => {
+        document.getElementById('tab-' + t).classList.add('hidden');
+        document.getElementById('btn-' + t).className = "flex-1 text-center text-gray-500 hover:text-blue-800";
+      });
+
+      document.getElementById('tab-' + tab).classList.remove('hidden');
+      document.getElementById('btn-' + tab).className = "flex-1 text-center text-blue-800 font-bold";
+    }
+
+    function renderTurmas() {
+      const container = document.getElementById('turmas-list');
+      container.innerHTML = '';
+      disciplinas.forEach(d => {
+        container.innerHTML += `
+          <div onclick="openDisciplineModal(${d.id})" class="bg-white border sigaa-border p-2.5 rounded shadow-sm text-xs cursor-pointer hover:border-blue-700 transition">
+            <div class="flex justify-between items-center border-b pb-1 mb-1">
+              <h4 class="font-bold text-blue-900">${d.nome}</h4>
+              <i class="fa-solid fa-chevron-right text-gray-400 text-[10px]"></i>
+            </div>
+            <div class="flex justify-between text-[10px] text-gray-600">
+              <span><b>Prof:</b> ${d.professor}</span>
+              <span><b>Local:</b> ${d.local}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderFaltas() {
+      const container = document.getElementById('faltas-list');
+      container.innerHTML = '';
+      disciplinas.forEach(d => {
+        const pct = Math.min(Math.round((d.faltas / d.limite) * 100), 100);
+        let colorClass = "bg-green-500";
+        if (pct >= 50 && pct < 75) colorClass = "bg-amber-500";
+        if (pct >= 75) colorClass = "bg-red-600";
+
+        container.innerHTML += `
+          <div class="bg-white border sigaa-border p-2.5 rounded shadow-sm space-y-1.5 text-xs">
+            <div class="flex justify-between items-start">
+              <h4 class="font-bold text-gray-800 text-[11px] max-w-[200px]">${d.nome}</h4>
+              <button onclick="registrarFalta(${d.id})" class="bg-blue-100 text-blue-800 hover:bg-blue-200 text-[10px] px-2 py-0.5 rounded font-bold border border-blue-300">
+                +1 Falta
+              </button>
+            </div>
+            
+            <div class="flex justify-between text-[11px]">
+              <span class="text-gray-600">Faltas: <b>${d.faltas}</b> / ${d.limite}</span>
+              <span class="font-bold text-gray-700">${pct}%</span>
+            </div>
+
+            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+              <div class="${colorClass} h-2 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function registrarFalta(id) {
+      const disc = disciplinas.find(d => d.id === id);
+      if (disc) {
+        disc.faltas += 1;
+        saveState();
+        renderFaltas();
+        showToast(`+1 falta registrada em ${disc.nome}`, 'warning');
+      }
+    }
+
+    function openDisciplineModal(id) {
+      const disc = disciplinas.find(d => d.id === id);
+      if (!disc) return;
+
+      document.getElementById('modal-disc-title').innerText = disc.nome;
+      document.getElementById('modal-disc-sub').innerText = `${disc.professor} • ${disc.local}`;
+      document.getElementById('modal-alert-text').innerText = `Atividade cadastrada: "${disc.atividade}"`;
+
+      document.getElementById('modal-discipline').classList.remove('hidden');
+      document.getElementById('modal-discipline').classList.add('flex');
+      
+      switchSubTab('atividades');
+      showToast(`Atividade nova em ${disc.nome}!`, 'info');
+    }
+
+    function closeDisciplineModal() {
+      document.getElementById('modal-discipline').classList.add('hidden');
+      document.getElementById('modal-discipline').classList.remove('flex');
+    }
+
+    function switchSubTab(sub) {
+      document.getElementById('subtab-atividades').classList.add('hidden');
+      document.getElementById('subtab-notas').classList.add('hidden');
+
+      document.getElementById('btn-subtab-atividades').className = "flex-1 py-2 text-center hover:bg-gray-200";
+      document.getElementById('btn-subtab-notas').className = "flex-1 py-2 text-center hover:bg-gray-200";
+
+      document.getElementById('subtab-' + sub).classList.remove('hidden');
+      document.getElementById('btn-subtab-' + sub).className = "flex-1 py-2 text-center text-blue-900 border-b-2 border-blue-800 bg-white font-bold";
+    }
+
+    // ================= CHATBOT MESTRE JM =================
+    async function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const box = document.getElementById('chat-messages');
+      const query = input.value.trim();
+      if (!query) return;
+
+      box.innerHTML += `
+        <div class="bg-blue-600 text-white p-2 rounded-lg max-w-[85%] ml-auto text-right text-xs shadow-sm mb-1">
+          ${query}
+        </div>
+      `;
+      input.value = '';
+      box.scrollTop = box.scrollHeight;
+
+      const loadingId = 'loading-' + Date.now();
+      box.innerHTML += `
+        <div id="${loadingId}" class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-lg max-w-[85%] text-xs shadow-sm mb-1 animate-pulse">
+          <p class="font-bold text-[10px] text-blue-800"><i class="fa-solid fa-robot"></i> Mestre JM:</p>
+          Pensando...
+        </div>
+      `;
+      box.scrollTop = box.scrollHeight;
+
+      const responseText = await generateJMResponse(query);
+
+      const loadingElem = document.getElementById(loadingId);
+      if (loadingElem) loadingElem.remove();
+
+      box.innerHTML += `
+        <div class="bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-lg max-w-[85%] text-xs shadow-sm mb-1">
+          <p class="font-bold text-[10px] text-blue-800 mb-0.5"><i class="fa-solid fa-robot"></i> Mestre JM:</p>
+          ${responseText}
+        </div>
+      `;
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function generateJMResponse(q) {
+      if (!GROQ_API_KEY || GROQ_API_KEY.includes("SUA_CHAVE_GROQ_AQUI")) {
+        return generateLocalFallbackResponse(q);
+      }
+
+      const contextoAluno = JSON.stringify({
+        aluno: currentUser ? currentUser.nome : 'Discente',
+        disciplinas: disciplinas
+      });
+
+      const systemPrompt = `Você é o Mestre JM, assistente virtual humanizado do aplicativo SIGAA de Bolso do Colégio Técnico de Bom Jesus (CTBJ/UFPI).
+      Responda de forma curta, clara e útil ao aluno em português.
+      Contexto de dados reais do discente: ${contextoAluno}.`;
+
+      const modelos = [
+        'llama-3.3-70b-versatile',
+        'llama-3.1-8b-instant',
+        'llama3-8b-8192',
+        'gemma2-9b-it'
+      ];
+
+      for (const model of modelos) {
+        try {
+          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${GROQ_API_KEY.trim()}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: q }
+              ],
+              temperature: 0.6,
+              max_tokens: 350
+            })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data.choices && data.choices[0]?.message?.content) {
+              return data.choices[0].message.content
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                .replace(/\n/g, '<br>');
+            }
+          }
+        } catch (err) {
+          console.warn(`Erro com modelo ${model}:`, err);
+        }
+      }
+
+      return generateLocalFallbackResponse(q);
+    }
+
+    function generateLocalFallbackResponse(q) {
+      const query = q.toLowerCase();
+      if (query.includes('falta') || query.includes('frequencia') || query.includes('ausencia')) {
+        const maisFaltas = [...disciplinas].sort((a,b) => b.faltas - a.faltas)[0];
+        return `Sua disciplina com mais faltas no momento é <b>${maisFaltas.nome}</b> (${maisFaltas.faltas}/${maisFaltas.limite} faltas). Mantenha a atenção para não ultrapassar o limite!`;
+      } 
+      else if (query.includes('horario') || query.includes('aula') || query.includes('grade') || query.includes('quando')) {
+        return `As aulas do CTBJ acontecem no período da <b>Tarde</b> (14h às 17h40). Consulte a aba <b>Grade</b> para ver a tabela semanal.`;
+      } 
+      else if (query.includes('nota') || query.includes('media') || query.includes('prova') || query.includes('atividade')) {
+        return `Para checar trabalhos e notas parciais, acesse a aba <b>Turmas</b> e clique sobre a matéria desejada.`;
+      } 
+      else if (query.includes('quem') || query.includes('jm') || query.includes('mestre')) {
+        return `Eu sou o <b>Mestre JM</b>, o assistente virtual do SIGAA de Bolso criado para ajudar você no CTBJ!`;
+      } 
+      else {
+        return `Certo! Como Mestre JM, posso te ajudar a consultar <b>faltas</b>, <b>turmas</b>, <b>horários</b> e <b>atividades</b>. O que você gostaria de saber?`;
+      }
+    }
+  </script>
+</body>
+</html>
